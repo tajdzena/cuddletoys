@@ -1,0 +1,10 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.heart-bullet::before {
+    content: '♡';
+    display: inline-block;
+    margin-right: 0.5rem;
+    color: currentColor;
+}
