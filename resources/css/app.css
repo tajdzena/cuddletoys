@@ -8,3 +8,7 @@
     margin-right: 0.5rem;
     color: currentColor;
 }
+
+.capitalize {
+    text-transform: capitalize;
+}

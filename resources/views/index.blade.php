@@ -31,19 +31,31 @@
     <!-- Najpopularnije igračke -->
     <x-title>Naše najpopularnije igračke</x-title>
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-12 mb-12">
-        <x-card-proizvod putanja="images/igracke/zaba/zaba1.png" href="igracka" alt="Žaba" naziv="Žaba" cena="2000 RSD"></x-card-proizvod>
-        <x-card-proizvod putanja="images/igracke/slon/slon1.png" href="igracka" alt="Slon" naziv="Slon" cena="2000 RSD"></x-card-proizvod>
-        <x-card-proizvod putanja="images/igracke/patka/patka1.png" href="igracka" alt="Patka" naziv="Patka" cena="2000 RSD"></x-card-proizvod>
-        <x-card-proizvod putanja="images/igracke/meda/meda1.png" href="igracka" alt="Meda" naziv="Meda" cena="2000 RSD"></x-card-proizvod>
+{{--        <x-card-proizvod putanja="images/igracke/zaba/zaba-zelena-crna.png" href="igracka" alt="Žaba" naziv="Žaba" cena="2000 RSD"></x-card-proizvod>--}}
+        @foreach($najnovijeIgracke as $igracka)
+            <x-card-proizvod
+                :putanja="isset($igracka->defaultBoje->slika) ? $igracka->defaultBoje->slika->putanja : 'images/no-image.jpg'"
+                href="igracka"
+                :alt="ucfirst($igracka->naziv_i)"
+                :naziv="ucfirst($igracka->naziv_i)"
+                :cena="isset($igracka->defaultKombinacija->cena_pravljenja) ? ('Od ' . $igracka->defaultKombinacija->cena_pravljenja . ' RSD') : '/ RSD'">
+            </x-card-proizvod>
+        @endforeach
     </div>
 
     <!-- Najpopularniji materijali -->
     <x-title>Naši najpopularniji materijali</x-title>
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-12">
-        <x-card-proizvod putanja="images/materijali/heklica/heklica3mm.jpg" alt="Heklica" href="materijal" naziv="Heklica 3-12mm" cena="200 RSD"></x-card-proizvod>
-        <x-card-proizvod putanja="images/materijali/vunica/vunica-zuta.jpg" alt="Vunica" href="materijal" naziv="Vunica" cena="400 RSD (po metru)"></x-card-proizvod>
-        <x-card-proizvod putanja="images/materijali/punjenje/punjenje300g.jpg" alt="Punjenje" href="materijal" naziv="Punjenje 300g" cena="700 RSD"></x-card-proizvod>
-        <x-card-proizvod putanja="images/materijali/makaze/makaze.jpg" alt="Makaze" href="materijal" naziv="Makaze" cena="500 RSD"></x-card-proizvod>
+{{--        <x-card-proizvod putanja="images/materijali/heklica/heklica3mm.jpg" alt="Heklica" href="materijal" naziv="Heklica 3-12mm" cena="200 RSD"></x-card-proizvod>--}}
+        @foreach($najnovijiMaterijali as $materijal)
+            <x-card-proizvod
+                :putanja="isset($materijal->defaultKombinacija->slika) ? $materijal->defaultKombinacija->slika->putanja : 'images/no-image.jpg'"
+                href="materijal"
+                :alt="ucfirst($materijal->naziv_m)"
+                :naziv="ucfirst($materijal->naziv_m)"
+                :cena="isset($materijal->defaultKombinacija->cena_m) ? ('Od ' . $materijal->defaultKombinacija->cena_m . ' RSD') : '/ RSD'">
+            </x-card-proizvod>
+        @endforeach
     </div>
 </x-glavni-div>
 
