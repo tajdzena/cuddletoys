@@ -1,4 +1,4 @@
-@props(['value', 'isDisabled' => '', 'isSelected'=>''])
+@props(['value', 'isDisabled' => '', 'isSelected'=>'', 'data_image'=>'', 'data_price'=>''])
 
 @php
     if($isDisabled == 'yes'){
@@ -9,4 +9,11 @@
     }
 @endphp
 
-<option class="bg-brighter-peach" value="{{$value}}" {{$isDisabled}} {{$isSelected}}>{{$slot}}</option>
+<option class="bg-brighter-peach"
+        value="{{$value}}"
+        data-image="{{$data_image}}"
+        data-price="{{$data_price}}"
+        {{$isDisabled}}
+        {{$isSelected}}>
+    {{$slot}}
+</option>

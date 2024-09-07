@@ -22,18 +22,21 @@ class MaterijalKombinacija extends Model
         'idSlika'
     ];
 
+    public function materijalBoja(){
+        return $this->belongsTo(MaterijalBoja::class, 'idMatBoja', 'idMatBoja');
+    }
 
     public function dimenzija()
     {
-        return $this->belongsTo(Dimenzije::class, 'idDimenzije');
+        return $this->belongsTo(Dimenzije::class, 'idDimenzije', 'idDimenzije');
     }
 
-    public function boja()
-    {
-        return $this->belongsTo(MaterijalBoja::class, 'idMatBoja');
-    }
+//    public function boja()
+//    {
+//        return $this->belongsTo(MaterijalBoja::class, 'idMatBoja');
+//    }
 
     public function slika(){
-        return $this->belongsTo(Slika::class, 'idSlika');
+        return $this->belongsTo(Slika::class, 'idSlika', 'idSlika');
     }
 }

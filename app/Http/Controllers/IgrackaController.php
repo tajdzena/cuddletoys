@@ -51,31 +51,64 @@ class IgrackaController extends Controller
         }
 
         // Dohvati sve igračke sa primenjenim sortiranjem
-        $igracke = $query->get();
+        //$igracke = $query->get();
 
-        //dd($igracke->pluck('defaultKombinacija.cena_pravljenja'));
+        // Paginacija sa 8 rezultata po stranici
+        $igracke = $query->paginate(8);
 
         // Izračunaj ukupnu cenu za svaku igračku
-//        foreach ($igracke as $igracka) {
-//            //$cenaVunice = $igracka->defaultBoje->bojaVunice->defaultKombinacija->cena_m ?? 0; //ovde prob sa vezama moracu resim
-//            //$cenaOciju = $igracka->defaultBoje->bojaOciju->defaultKombinacija->cena_m ?? 0;
-//
-//            $cenaVunice = 350.00; //ovo jeste fiksno
-//            $cenaOciju = 120.00; //najmanja cena kao default
-//            $ukupnaCena = $igracka->defaultKombinacija->cena_pravljenja + $cenaVunice + $cenaOciju; //kao da sabira konstantno sa prvom cenom pravljenja
-//        }
+        foreach ($igracke as $igracka) {
+            $cenaVunice = optional($igracka->defaultBoje->bojaVunice->defaultKombinacija)->cena_m ?? 0;
+            $cenaOciju = optional($igracka->defaultBoje->bojaOciju->defaultKombinacija)->cena_m ?? 0;
+            $igracka->ukupnaCena = $igracka->defaultKombinacija->cena_pravljenja + $cenaVunice + $cenaOciju;
+        }
 
-        //dd($igracke->pluck('ukupna_cena'));
-
+        $igracke->appends(['sort' => $sortOption]); //da se sortiranje prebaci i na druge strane
         return view('igracke.index', ['igracke' => $igracke, 'selectedSort' => $sortOption]);
-        //return view('igracke.index', ['igracke' => $igracke, 'selectedSort' => $sortOption, 'ukupnaCena' => $ukupnaCena]); //sort option da se ne bi odmah nakon sortiranja refreshovao select
+        //sort option da se ne bi odmah nakon sortiranja refreshovao select
     }
 
-//    public function show($idIgracka)
-//    {
-//        $igracka = Igracka::with(['defaultBoje.slika', 'defaultKombinacija'])->findOrFail($idIgracka);
-//
-//        return view('igracka.show', compact('igracka'));
-//    }
+    public function show($id)
+    {
+        // Prikaz pojedinačne igračke
+        $igracka = Igracka::with([
+            'defaultBoje.slika',
+            'defaultKombinacija',
+            'boje.bojaVunice.boja',
+            'boje.bojaOciju.boja',
+            'kombinacije.dimenzija'
+        ])->findOrFail($id);
+
+        //dd($igracka->boje->pluck('bojaVunice.boja')); // Check if the correct data is retrieved
+
+        // Prikupite dostupne boje vunice i očiju za igracku
+        $bojeVunice = $igracka->boje->pluck('bojaVunice')->unique('idBoja');
+        //dd($bojeVunice);
+        $bojeOciju = $igracka->boje->pluck('bojaOciju')->unique('idBoja');
+
+        // Prikupite sve dimenzije dostupne za igračku zajedno sa cenom iz kombinacija
+        $dimenzije = $igracka->kombinacije->map(function ($kombinacija) {
+            return [
+                'idDimenzije' => $kombinacija->dimenzija->idDimenzije,
+                'naziv_d' => $kombinacija->dimenzija->naziv_d,
+                'cena_pravljenja' => $kombinacija->cena_pravljenja,
+            ];
+        })->unique('idDimenzije');
+
+        // Definišite defaultne boje za igracku
+        $defaultBojaVunice = $bojeVunice->first()->boja->naziv_b ?? 'Ne postoji default boja vunice';
+        if($defaultBojaVunice == 'žuta'){
+            $defaultBojaVunice = 'zuta';
+        }
+        $defaultBojaOciju = $bojeOciju->first()->boja->naziv_b ?? 'Ne postoji default boja očiju';
+
+        return view('igracke.show',
+            compact('igracka',
+                'bojeVunice',
+                'bojeOciju',
+                'dimenzije',
+                'defaultBojaVunice',
+                'defaultBojaOciju'));
+    }
 
 }

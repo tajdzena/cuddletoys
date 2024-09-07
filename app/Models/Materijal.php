@@ -20,7 +20,18 @@ class Materijal extends Model
     public function defaultKombinacija()
     {
         return $this->hasOneThrough(MaterijalKombinacija::class, MaterijalBoja::class, 'idMaterijal', 'idMatBoja')
-            ->where('default', true)
-            ->orderBy('cena_m', 'asc');
+            ->where('default', true);
+    }
+
+    public function boje()
+    {
+        return $this->hasMany(MaterijalBoja::class, 'idMaterijal', 'idMaterijal');
+    }
+
+
+    public function kombinacije()
+    {
+        // Promena u ovoj liniji: Povezujemo se na IgrackaKombinacija preko IgrackaBoje
+        return $this->hasManyThrough(MaterijalKombinacija::class, MaterijalBoja::class, 'idMaterijal', 'idMatBoja', 'idMaterijal', 'idMatBoja');
     }
 }

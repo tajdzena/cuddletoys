@@ -27,7 +27,7 @@
             <!-- Sortiranje -->
             <div>
                 <label for="sort" class="block text-dark-pink font-semibold mb-2">Sortiraj po:</label>
-                <x-select id="sort" name="sort">
+                <x-select id="sort" name="sort" onchange="this.form.submit()">
                     <x-option value="" isDisabled="yes" isSelected="{{ $selectedSort == '' ? 'yes' : '' }}">Izaberi sortiranje</x-option>
                     <x-option value="1" isSelected="{{ $selectedSort == '1' ? 'yes' : '' }}">Cena (rastuće)</x-option>
                     <x-option value="2" isSelected="{{ $selectedSort == '2' ? 'yes' : '' }}">Cena (opadajuće)</x-option>
@@ -47,20 +47,19 @@
                 <!-- Prikaz igracke -->
                 <x-card-proizvod
                     :putanja="isset($product->defaultBoje->slika) ? $product->defaultBoje->slika->putanja : 'images/no-image.jpg'"
-                    href="{{ route('igracke.show', $product->idIgracka) }}"
-{{--                    bice posle igracka.show--}}
+                    href="igracke/{{$product->idIgracka}}"
                     :alt="ucfirst($product->naziv_i)"
                     :naziv="ucfirst($product->naziv_i)"
-                    :cena="isset($product->defaultKombinacija->cena_pravljenja) ? ('Od ' . $product->defaultKombinacija->cena_pravljenja . ' RSD') : '/ RSD'">
+                    :cena="isset($product->ukupnaCena) ? ('Od ' . sprintf('%.2f', $product->ukupnaCena) . ' RSD') : '/ RSD'">
                 </x-card-proizvod>
             @elseif($product instanceof \App\Models\Materijal)
                 <!-- Prikaz materijala -->
                 <x-card-proizvod
                     :putanja="isset($product->defaultKombinacija->slika) ? $product->defaultKombinacija->slika->putanja : 'images/no-image.jpg'"
-                    href="{{ route('materijali.show', $product->idMaterijal) }}"
+                    href="materijali/{{$product->idMaterijal}}"
                     :alt="ucfirst($product->naziv_m)"
                     :naziv="ucfirst($product->naziv_m)"
-                    :cena="isset($product->defaultKombinacija->cena_m) ? ('Od ' . $product->defaultKombinacija->cena_m . ' RSD') : '/ RSD'">
+                    :cena="isset($product->defaultKombinacija->cena_m) ? ('Od ' . sprintf('%.2f', $product->defaultKombinacija->cena_m) . ' RSD') : '/ RSD'">
                 </x-card-proizvod>
             @endif
         @endforeach
@@ -68,15 +67,9 @@
 
     <!-- Navigacija za paginaciju -->
     <div class="mt-6">
-        {{ $results->links() }}
+        {{ $results->appends(['sort' => $selectedSort, 'search' => $searchTerm])->links('pagination::simple-tailwind') }}
     </div>
 
 </x-glavni-div>
 
 <x-footer />
-
-<script>
-    document.getElementById('sort').addEventListener('change', function () {
-        this.form.submit();
-    });
-</script>

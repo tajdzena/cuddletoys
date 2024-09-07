@@ -1,22 +1,31 @@
 <x-nav>
-    <title>CuddleToys - Materijal</title>
+    <title class="capitalize">CuddleToys - {{ ucfirst($materijal->naziv_m) }}</title>
 </x-nav>
 
 <x-glavni-div>
     <x-path>
-        / <a href="/materijali" class="hover:underline"> Materijali</a>
-        / <a href="/materijal" class="hover:underline"> Materijal</a> <!-- specifican id igracke kasnije -->
+        / <a href="{{ route('materijali.index') }}" class="hover:underline"> Materijali</a>
+        / <a href="materijali/{{$materijal->idMaterijal}}" class="hover:underline capitalize"> {{ ucfirst($materijal->naziv_m) }} </a>
     </x-path>
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-
         <!-- Slajder -->
         <div class="relative mx-auto mt-10 mb-12 overflow-hidden">
             <div id="slider" class="flex transition-transform duration-700 ease-in-out">
-                <x-slika putanja="images/materijali/heklica/heklica3mm.jpg" alt="Heklica" h="56"></x-slika>
-                <x-slika putanja="images/materijali/heklica/heklica5mm.jpg" alt="Heklica" h="56"></x-slika>
-                <x-slika putanja="images/materijali/heklica/heklica8mm.jpg" alt="Heklica" h="56"></x-slika>
-                <x-slika putanja="images/materijali/heklica/heklica12mm.jpg" alt="Heklica" h="56"></x-slika>
+                <!-- Prva slika se menja u skladu sa izborom korisnika -->
+                @php
+                    if($materijal->naziv_m == 'oči'){
+                        $materijal->naziv_m = 'oci';
+                    }
+                @endphp
+                <img id="{{$materijal->naziv_m}}"
+                     src="{{ asset('images/materijali/' . $materijal->naziv_m . '/' . $materijal->naziv_m . '-' . $materijal->defaultKombinacija->dimenzija->naziv_d . '-' . $defaultBojaMaterijala . '.jpg') }}"
+                     alt="{{ ucfirst($materijal->naziv_m) }}"
+                     class="w-full h-62 object-cover rounded-md">
+                <img id="{{$materijal->naziv_m}}"
+                     src="{{ asset('images/materijali/' . $materijal->naziv_m . '/' . $materijal->naziv_m . '.jpg') }}"
+                     alt="{{ ucfirst($materijal->naziv_m) }}"
+                     class="w-full h-62 object-cover rounded-md">
             </div>
 
             <!-- Navigacija slajdera -->
@@ -29,12 +38,19 @@
         </div>
 
         <!-- Detalji proizvoda -->
+        @php
+            if($materijal->naziv_m == 'oci'){
+                $materijal->naziv_m = 'oči';
+            }
+        @endphp
         <div class="flex flex-col justify-start mt-14">
-            <h2 class="text-2xl font-bold text-purple mb-10">Heklica</h2>
-            <p class="text-gray-700 mb-20">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Accusamus aspernatur fuga in mollitia perspiciatis quidem sed soluta. Ad aperiam beatae, fuga maiores officia quos saepe suscipit tempora totam vero. Doloremque?</p>
+            <h2 class="text-2xl font-bold text-purple mb-10 capitalize">{{ ucfirst($materijal->naziv_m) }}</h2>
+            <p class="text-gray-700 mb-20">{{ $materijal->opis_m }}</p>
 
-            <div class="flex flex-row mb-4">
-                <p class="text-2xl font-bold text-dark-pink">350 RSD</p>
+            <div class="flex flex-row mb-12">
+                <p class="text-2xl font-bold text-dark-pink" id="cena-materijala">
+                    {{ sprintf('%.2f', ($materijal->defaultKombinacija->cena_m)) }} RSD
+                </p>
 
                 <div class="ml-auto mr-7">
                     <input type="number" min="1" value="1" class="mr-4 w-14 h-10 text-lg text-center border border-gray-300 rounded">
@@ -42,33 +58,94 @@
                 </div>
             </div>
 
-
             <!-- Opcije za prilagođavanje -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-11 mt-8">
-                <!-- Boja -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-11">
+                <!-- Boja materijala -->
                 <div>
-                    <label for="boja_mat" class="block text-dark-pink font-semibold mb-2">Boja materijala</label>
-                    <x-select id="boja_mat" name="boja_mat">
-                        <x-option value="zelena">Zelena</x-option>
-                        <x-option value="plava">Plava</x-option>
-                        <x-option value="roze">Roze</x-option>
-                        <x-option value="zuta">Žuta</x-option>
+                    <label for="boja_materijala" class="block text-dark-pink font-semibold mb-2">Boja materijala</label>
+                    <x-select id="boja_materijala" name="boja_materijala" onchange="updateImage()">
+                        @foreach($bojeMaterijala as $boja)
+                            <option value="{{ ($boja->naziv_b) }}" class="capitalize">
+                                {{ ucfirst($boja->naziv_b) }}
+                            </option>
+                        @endforeach
                     </x-select>
                 </div>
+
+                <!-- Dimenzije materijala -->
                 <div>
-                    <label for="dimenzije_mat" class="block text-dark-pink font-semibold mb-2">Veličina materijala</label>
-                    <x-select id="dimenzije_mat" name="dimenzije_mat">
-                        <x-option value="1">3mm</x-option>
-                        <x-option value="2">5mm</x-option>
-                        <x-option value="3">8mm</x-option>
-                        <x-option value="4">12mm</x-option>
+                    <label for="dimenzije" class="block text-dark-pink font-semibold mb-2">Dimenzije</label>
+                    <x-select id="dimenzije" name="dimenzije" onchange="updateBoje(); updatePrice()">
+                        @foreach($dimenzije as $dimenzija)
+                            <option value="{{ $dimenzija['idDimenzije'] }}"
+                                    data-price="{{ $dimenzija['cena_m'] ?? 0 }}"
+                                    name="{{ $dimenzija['naziv_d'] }}">
+                                {{ $dimenzija['naziv_d'] }}
+                            </option>
+                        @endforeach
                     </x-select>
                 </div>
             </div>
-
-            <p class="mt-8 text-blue">Imaš posebne zahteve za materijal? <a href="/kontakt" class="text-hot-pink underline">Piši nam</a>.</p>
         </div>
     </div>
 </x-glavni-div>
 
 <x-footer />
+
+@verbatim
+    <script>
+        var prviSlajder = document.querySelector('#slider img:first-child');
+
+        function updateBoje() {
+            var idDimenzije = document.getElementById('dimenzije').value;
+
+            fetch(`/materijal-boje/${idDimenzije}`)
+                .then(response => response.json())
+                .then(data => {
+                    var selectBoja = document.getElementById('boja_materijala');
+                    selectBoja.innerHTML = ''; // Očisti trenutne boje
+
+                    if (data.boje.length > 0) {
+                        data.boje.forEach(boja => {
+                            var option = document.createElement('option');
+                            option.value = boja.naziv_b;
+                            option.text = boja.naziv_b.charAt(0).toUpperCase() + boja.naziv_b.slice(1);
+                            selectBoja.appendChild(option);
+                        });
+
+                        // Postavi prvu boju kao default nakon promene dimenzije
+                        selectBoja.selectedIndex = 0;
+
+                        // Automatski ažuriraj sliku koristeći prvu boju iz novog seta boja
+                        updateImage();
+                    }
+                });
+        }
+
+        function updateImage() {
+            var bojaMaterijala = document.getElementById('boja_materijala').value.toLowerCase();
+            var materijalNaziv = prviSlajder.id.toLowerCase();
+
+            var selectDimenzija = document.getElementById('dimenzije').selectedOptions[0];
+            var dimenzijaNaziv = selectDimenzija.getAttribute('name').toLowerCase();
+            //onsole.log(dimenzijaNaziv);
+
+            if(bojaMaterijala === 'žuta'){
+                bojaMaterijala = 'zuta';
+            }
+
+            // Formiranje putanje slike
+            var novaPutanja = "/images/materijali/" + materijalNaziv + "/" + materijalNaziv + "-" + dimenzijaNaziv + "-" + bojaMaterijala + ".jpg";
+            console.log(novaPutanja);
+            document.querySelector('#slider img:first-child').src = novaPutanja;
+        }
+
+        function updatePrice() {
+            var selectDimenzija = document.getElementById('dimenzije');
+            var dimenzija = selectDimenzija.options[selectDimenzija.selectedIndex];
+            var cenaDimenzije = parseFloat(dimenzija.getAttribute('data-price')) || 0;
+
+            document.getElementById('cena-materijala').innerText = cenaDimenzije.toFixed(2) + ' RSD';
+        }
+    </script>
+@endverbatim

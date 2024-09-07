@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "12f0e4826ade5bb75ea51f4024bc42bf",
+    "content-hash": "834409eae8cd105359799d8674a84380",
     "packages": [
         {
             "name": "brick/math",
@@ -5543,6 +5543,65 @@
                 }
             ],
             "time": "2024-07-20T21:52:34+00:00"
+        },
+        {
+            "name": "vojislavd/laravel-serbian-translation",
+            "version": "v2.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/VojislavD/laravel-serbian-translation.git",
+                "reference": "69ac206493fff5d466962a716f8b3029a97f0cad"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/VojislavD/laravel-serbian-translation/zipball/69ac206493fff5d466962a716f8b3029a97f0cad",
+                "reference": "69ac206493fff5d466962a716f8b3029a97f0cad",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^8.0"
+            },
+            "require-dev": {
+                "orchestra/testbench": "^7.0",
+                "phpunit/phpunit": "^9.5.10"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "VojislavD\\LaravelSerbianTranslation\\LaravelSerbianTranslationServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "VojislavD\\LaravelSerbianTranslation\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Vojislav Dragicevic",
+                    "email": "vojislavdragicevic17@gmail.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Translation of Laravel framework to Serbian language",
+            "homepage": "https://github.com/vojislavd/laravel-serbian-translation",
+            "keywords": [
+                "laravel",
+                "laravel-serbian-translation",
+                "vojislavd"
+            ],
+            "support": {
+                "issues": "https://github.com/VojislavD/laravel-serbian-translation/issues",
+                "source": "https://github.com/VojislavD/laravel-serbian-translation/tree/v2.0.0"
+            },
+            "abandoned": true,
+            "time": "2022-02-09T12:16:27+00:00"
         },
         {
             "name": "voku/portable-ascii",

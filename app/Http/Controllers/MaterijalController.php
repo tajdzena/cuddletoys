@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Materijal;
+use App\Models\MaterijalKombinacija;
 use Illuminate\Http\Request;
 
 class MaterijalController extends Controller
@@ -49,17 +50,58 @@ class MaterijalController extends Controller
         }
 
         // Dohvati sve materijale sa primenjenim sortiranjem
-        $materijali = $query->get();
+        //$materijali = $query->get();
 
+        $materijali = $query->paginate(8);
 
+        $materijali->appends(['sort' => $sortOption]);
         return view('materijali.index', ['materijali' => $materijali, 'selectedSort' => $sortOption]);
     }
 
     public function show($id)
     {
-//        // Prikaz pojedinačnog materijala
-//        $materijal = Materijal::with(['kombinacije.dimenzije', 'kombinacije.slika'])
-//            ->findOrFail($id);
-//        return view('materijali.show', ['materijal' => $materijal]);
+        // Prikaz pojedinačnog materijala
+        $materijal = Materijal::with([
+            'defaultKombinacija.slika',
+            'boje.boja',
+            'kombinacije.dimenzija'
+        ])->findOrFail($id);
+
+        // Prikupite dostupne boje materijala
+        $bojeMaterijala = $materijal->boje->pluck('boja')->unique('idBoja');
+
+        // Prikupite sve dimenzije dostupne za materijal
+        $dimenzije = $materijal->kombinacije->map(function ($kombinacija) {
+            return [
+                'idDimenzije' => $kombinacija->dimenzija->idDimenzije,
+                'naziv_d' => $kombinacija->dimenzija->naziv_d,
+                'cena_m' => $kombinacija->cena_m,
+            ];
+        })->unique('idDimenzije');
+
+        // Definišite default dimenziju i boje
+        $defaultDimenzija = $dimenzije->first();
+        $bojeMaterijala = $materijal->kombinacije->where('idDimenzije', $defaultDimenzija['idDimenzije'])
+            ->map(function ($kombinacija) {
+                return $kombinacija->materijalBoja->boja;
+            })->unique('idBoja');
+
+        // Default boja materijala
+        $defaultBojaMaterijala = $bojeMaterijala->first()->naziv_b ?? 'default';
+
+        return view('materijali.show',
+            compact('materijal', 'bojeMaterijala', 'dimenzije', 'defaultBojaMaterijala', 'defaultDimenzija'));
+    }
+
+
+    public function getBojeByDimenzija($idDimenzije)
+    {
+        $boje = MaterijalKombinacija::where('idDimenzije', $idDimenzije)
+            ->with('materijalBoja.boja')
+            ->get()
+            ->pluck('materijalBoja.boja')
+            ->unique('idBoja');
+
+        return response()->json(['boje' => $boje]);
     }
 }

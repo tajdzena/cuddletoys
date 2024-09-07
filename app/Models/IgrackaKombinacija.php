@@ -20,7 +20,6 @@ class IgrackaKombinacija extends Model
         'cena_pravljenja',
     ];
 
-
     public function dimenzija()
     {
         return $this->belongsTo(Dimenzije::class, 'idDimenzije');

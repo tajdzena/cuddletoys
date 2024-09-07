@@ -35,10 +35,10 @@
         @foreach($najnovijeIgracke as $igracka)
             <x-card-proizvod
                 :putanja="isset($igracka->defaultBoje->slika) ? $igracka->defaultBoje->slika->putanja : 'images/no-image.jpg'"
-                href="igracka"
+                href="igracke/{{$igracka->idIgracka}}"
                 :alt="ucfirst($igracka->naziv_i)"
                 :naziv="ucfirst($igracka->naziv_i)"
-                :cena="isset($igracka->defaultKombinacija->cena_pravljenja) ? ('Od ' . $igracka->defaultKombinacija->cena_pravljenja . ' RSD') : '/ RSD'">
+                :cena="isset($igracka->ukupnaCena) ? ('Od ' . sprintf('%.2f', $igracka->ukupnaCena) . ' RSD') : '/ RSD'">
             </x-card-proizvod>
         @endforeach
     </div>
@@ -50,10 +50,10 @@
         @foreach($najnovijiMaterijali as $materijal)
             <x-card-proizvod
                 :putanja="isset($materijal->defaultKombinacija->slika) ? $materijal->defaultKombinacija->slika->putanja : 'images/no-image.jpg'"
-                href="materijal"
+                href="materijali/{{$materijal->idMaterijal}}"
                 :alt="ucfirst($materijal->naziv_m)"
                 :naziv="ucfirst($materijal->naziv_m)"
-                :cena="isset($materijal->defaultKombinacija->cena_m) ? ('Od ' . $materijal->defaultKombinacija->cena_m . ' RSD') : '/ RSD'">
+                :cena="isset($materijal->defaultKombinacija->cena_m) ? ('Od ' . sprintf('%.2f', $materijal->defaultKombinacija->cena_m) . ' RSD') : '/ RSD'">
             </x-card-proizvod>
         @endforeach
     </div>

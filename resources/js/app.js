@@ -20,7 +20,7 @@ import './bootstrap';
     showSlide(currentIndex);
 });
 
-    // Optional: Automatska rotacija slajdera svakih 10 sekundi
+    // Optional: Automatska rotacija slajdera svakih 20 sekundi
     setInterval(() => {
     nextButton.click();
-}, 10000);
+}, 20000);

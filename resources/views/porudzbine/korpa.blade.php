@@ -25,7 +25,7 @@
                 <tbody>
                 <!-- Uključi komponentu za svaki red proizvoda -->
                 <x-korpa-proizvod image="/images/igracke/zaba/zaba-zelena-plava.png" vrsta="igracka" naziv="Žaba" boja_vunice="zelena" boja_ociju="plava" dimenzije="15x30x30" cena="900" kolicina="1" />
-                <x-korpa-proizvod image="/images/materijali/heklica/heklica5mm.jpg" vrsta="materijal" naziv="Heklica" boja_mat="plava" cena="900" dimenzije="5mm" kolicina="1" />
+                <x-korpa-proizvod image="/images/materijali/heklica/heklica-5mm-zuta.jpg" vrsta="materijal" naziv="Heklica" boja_mat="žuta" cena="900" dimenzije="5mm" kolicina="1" />
                 <x-korpa-proizvod image="/images/igracke/zaba/zaba-zelena-plava.png" vrsta="igracka" naziv="Žaba" boja_vunice="zelena" boja_ociju="plava" dimenzije="30x60x60" cena="900" kolicina="1" />
                 <!-- Dodajte više redova po potrebi -->
                 </tbody>

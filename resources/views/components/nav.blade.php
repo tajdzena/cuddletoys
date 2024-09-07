@@ -40,17 +40,17 @@
 
         <!-- Desktop Navigation Links -->
         <div class="hidden lg:flex lg:gap-x-12">
-            <x-nav-link putanja="../igracke">Igračke</x-nav-link>
-            <x-nav-link putanja="../materijali">Materijali</x-nav-link>
-            <x-nav-link putanja="../tutorijali">Tutorijali</x-nav-link>
-            <x-nav-link putanja="../kontakt">Kontakt</x-nav-link>
-            <x-nav-link putanja="../o-nama">O nama</x-nav-link>
+            <x-nav-link putanja="/igracke">Igračke</x-nav-link>
+            <x-nav-link putanja="/materijali">Materijali</x-nav-link>
+            <x-nav-link putanja="/tutorijali">Tutorijali</x-nav-link>
+            <x-nav-link putanja="/kontakt">Kontakt</x-nav-link>
+            <x-nav-link putanja="/o-nama">O nama</x-nav-link>
         </div>
 
         <!-- Desktop Icons -->
         <div class="hidden lg:flex lg:flex-1 lg:justify-end lg:gap-x-6">
             <!-- Ikonica za pretragu -->
-            <a href="../pretraga" class="text-dark-pink hover:text-hot-pink">
+            <a href="/pretraga" class="text-dark-pink hover:text-hot-pink">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M10 18a8 8 0 100-16 8 8 0 000 16z" />
                 </svg>
@@ -66,8 +66,22 @@
                     <span class="sr-only">Profil</span>
                 </button>
                 <div id="profile-dropdown-menu" class="absolute right-0 mt-2 w-48 bg-brighter-peach rounded-md shadow-lg py-2 hidden">
-                    <a href="../prijava" class="block px-4 py-2 text-sm text-dark-pink hover:bg-dark-pink/10">Prijavi se</a>
-                    <a href="../registracija" class="block px-4 py-2 text-sm text-dark-pink hover:bg-dark-pink/10">Registruj se</a>
+                    @auth
+                        <!-- Prikaz za ulogovane korisnike -->
+                        <a href="/nalog" class="block px-4 py-2 text-sm text-dark-pink hover:bg-dark-pink/10">Moj nalog</a>
+                        <form action="{{ route('prijava.destroy') }}" method="POST">
+                            @csrf
+                            <button type="submit"
+                                    class="block w-full text-left px-4 py-2
+                                     @if (Request::is('nalog')) -mb-4 @endif
+                                    text-sm text-dark-pink hover:bg-dark-pink/10">Odjavi se</button>
+                        </form>
+                    @endauth
+                    @guest
+                        <!-- Prikaz za goste (neulogovane korisnike) -->
+                        <a href="/prijava" class="block px-4 py-2 text-sm text-dark-pink hover:bg-dark-pink/10">Prijavi se</a>
+                        <a href="/registracija" class="block px-4 py-2 text-sm text-dark-pink hover:bg-dark-pink/10">Registruj se</a>
+                    @endguest
                 </div>
             </div>
 
@@ -99,11 +113,11 @@
         <div class="mt-6 flow-root">
             <div class="-my-6 divide-y divide-gray-500/40">
                 <div class="space-y-2 py-6">
-                    <x-mobile-nav-link putanja="../igracke">Igračke</x-mobile-nav-link>
-                    <x-mobile-nav-link putanja="../materijali">Materijali</x-mobile-nav-link>
-                    <x-mobile-nav-link putanja="../tutorijali">Tutorijali</x-mobile-nav-link>
-                    <x-mobile-nav-link putanja="../kontakt">Kontakt</x-mobile-nav-link>
-                    <x-mobile-nav-link putanja="../o-nama">O nama</x-mobile-nav-link>
+                    <x-mobile-nav-link putanja="/igracke">Igračke</x-mobile-nav-link>
+                    <x-mobile-nav-link putanja="/materijali">Materijali</x-mobile-nav-link>
+                    <x-mobile-nav-link putanja="/tutorijali">Tutorijali</x-mobile-nav-link>
+                    <x-mobile-nav-link putanja="/kontakt">Kontakt</x-mobile-nav-link>
+                    <x-mobile-nav-link putanja="/o-nama">O nama</x-mobile-nav-link>
                 </div>
                 <div class="py-6">
                     <x-mobile-nav-link putanja="../pretraga">Traži</x-mobile-nav-link>
@@ -115,8 +129,8 @@
                             </svg>
                         </button>
                         <div id="mobile-profile-dropdown-menu" class="-ml-1 mr-3 mt-2 bg-brighter-peach rounded-md shadow-lg py-2 hidden">
-                            <a href="#" class="block px-4 py-2 text-sm text-dark-pink hover:bg-dark-pink/10">Prijavite se</a>
-                            <a href="#" class="block px-4 py-2 text-sm text-dark-pink hover:bg-dark-pink/10">Registrujte se</a>
+                            <a href="/prijava" class="block px-4 py-2 text-sm text-dark-pink hover:bg-dark-pink/10">Prijavi se</a>
+                            <a href="/registracija" class="block px-4 py-2 text-sm text-dark-pink hover:bg-dark-pink/10">Registruj se</a>
                         </div>
                     </div>
                     <x-mobile-nav-link putanja="../korpa">Korpa</x-mobile-nav-link>

@@ -11,6 +11,13 @@ class StranicaController extends Controller{
     public function pocetna(){
         $najnovijeIgracke = Igracka::latest()->with(['defaultBoje.slika', 'defaultKombinacija'])->take(4)->get();
         $najnovijiMaterijali = Materijal::latest()->with(['defaultKombinacija'])->take(4)->get();
+
+        foreach ($najnovijeIgracke as $igracka) {
+            $cenaVunice = optional($igracka->defaultBoje->bojaVunice->defaultKombinacija)->cena_m ?? 0;
+            $cenaOciju = optional($igracka->defaultBoje->bojaOciju->defaultKombinacija)->cena_m ?? 0;
+            $igracka->ukupnaCena = $igracka->defaultKombinacija->cena_pravljenja + $cenaVunice + $cenaOciju;
+        }
+
         return view('index', [
             'najnovijeIgracke' => $najnovijeIgracke,
             'najnovijiMaterijali' => $najnovijiMaterijali,

@@ -1,5 +1,5 @@
 <x-nav>
-    <title>Registracija - CuddleToys</title>
+    <title>CuddleToys - Registracija</title>
 </x-nav>
 
 <x-glavni-div>
@@ -13,13 +13,24 @@
     <!-- Dodajemo klase za centriranje -->
     <div class="flex justify-center">
         <div class="w-full max-w-md bg-brighter-peach rounded-lg shadow-lg p-6">
-            <form action="#" method="POST">
+            <form action="{{ route('registracija.store') }}" method="POST">
+                @csrf
 
-                <x-label-input for="ime" text="Ime" type="text" id="ime" name="ime" placeholder="Pera"></x-label-input>
-                <x-label-input for="prezime" text="Prezime" type="text" id="prezime" name="prezime" placeholder="Perić"></x-label-input>
-                <x-label-input for="mejl" text="Mejl" type="email" id="mejl" name="mejl" placeholder="pera.peric@gmail.com"></x-label-input>
-                <x-label-input for="kor_ime" text="Korisničko ime" type="text" id="kor_ime" name="kor_ime" placeholder="peraperic"></x-label-input>
-                <x-label-input for="adresa" text="Adresa (opciono)" type="text" id="adresa" name="adresa" placeholder="Beograd, Adresa 123, 11000" isRequired="no"></x-label-input>
+                @if ($errors->any())
+                    <div class="bg-red-100 text-red-500 p-3 mb-6 rounded">
+                        <ul>
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
+
+                <x-label-input for="ime" text="Ime" type="text" id="ime" name="ime" placeholder="Pera" value="{{ old('ime') }}"></x-label-input>
+                <x-label-input for="prezime" text="Prezime" type="text" id="prezime" name="prezime" placeholder="Perić" value="{{ old('prezime') }}"></x-label-input>
+                <x-label-input for="mejl" text="Mejl" type="email" id="mejl" name="mejl" placeholder="pera.peric@gmail.com" value="{{ old('mejl') }}"></x-label-input>
+                <x-label-input for="kor_ime" text="Korisničko ime" type="text" id="kor_ime" name="kor_ime" placeholder="peraperic" value="{{ old('kor_ime') }}"></x-label-input>
+                <x-label-input for="adresa" text="Adresa (opciono)" type="text" id="adresa" name="adresa" placeholder="Beograd, Adresa 123, 11000" value="{{ old('adresa') }}" isRequired="no"></x-label-input>
 
                 <!-- Lozinka sa dugmetom za prikazivanje/sakrivanje -->
                 <div class="mb-4 relative">
@@ -30,9 +41,9 @@
 
                 <!-- Potvrda lozinke sa dugmetom za prikazivanje/sakrivanje -->
                 <div class="mb-4 relative">
-                    <label for="lozinka_potvrda" class="block text-dark-pink font-semibold mb-2">Potvrda lozinke</label>
-                    <input type="password" id="lozinka_potvrda" name="lozinka_potvrda" class="w-full bg-white border border-gray-300 rounded-lg px-4 py-2" placeholder="Ponovo unesi lozinku">
-                    <button type="button" onclick="togglePasswordVisibility('lozinka_potvrda', this)" class="absolute right-3 top-10 text-sm text-purple bg-white p-1 focus:outline-none">Prikaži</button>
+                    <label for="lozinka_confirmation" class="block text-dark-pink font-semibold mb-2">Potvrda lozinke</label>
+                    <input type="password" id="lozinka_confirmation" name="lozinka_confirmation" class="w-full bg-white border border-gray-300 rounded-lg px-4 py-2" placeholder="Ponovo unesi lozinku">
+                    <button type="button" onclick="togglePasswordVisibility('lozinka_confirmation', this)" class="absolute right-3 top-10 text-sm text-purple bg-white p-1 focus:outline-none">Prikaži</button>
                 </div>
 
                 <p class="text-sm text-blue mt-6">* Molimo da u adresu upišeš grad, ulicu, broj i poštanski broj.</p>
@@ -41,7 +52,7 @@
                 <x-button type="submit" class="w-full px-4 py-3 mt-4">Registruj se</x-button>
 
                 <!-- Link za registraciju -->
-                <p class="mt-4 text-center text-sm text-gray-600">Imaš nalog? <a href="prijava" class="text-purple hover:underline">Prijavi se</a></p>
+                <p class="mt-4 text-center text-sm text-gray-600">Imaš nalog? <a href="/prijava" class="text-purple hover:underline">Prijavi se</a></p>
             </form>
         </div>
     </div>

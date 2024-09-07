@@ -14,16 +14,30 @@ class MaterijalBoja extends Model
 
     public function boja()
     {
-        return $this->belongsTo(Boja::class, 'idBoja');
+        return $this->belongsTo(Boja::class, 'idBoja', 'idBoja');
+    }
+
+    public function igrackaVunica(){
+        return $this->hasMany(IgrackaBoje::class, 'idBojaVunice', 'idMatBoja');
+    }
+
+    public function igrackaOci(){
+        return $this->hasMany(IgrackaBoje::class, 'idBojaOciju', 'idMatBoja');
     }
 
     public function materijal()
     {
-        return $this->belongsTo(Materijal::class, 'idMaterijal');
+        return $this->belongsTo(Materijal::class, 'idMaterijal', 'idMaterijal');
     }
 
-    public function kombinacija()
+    public function kombinacije()
     {
-        return $this->hasMany(MaterijalKombinacija::class, 'idMatBoja');
+        return $this->hasMany(MaterijalKombinacija::class, 'idMatBoja', 'idMatBoja');
+    }
+
+    public function defaultKombinacija()
+    {
+        return $this->hasOne(MaterijalKombinacija::class, 'idMatBoja')
+            ->where('default', true);;
     }
 }

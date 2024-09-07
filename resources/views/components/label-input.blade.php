@@ -1,4 +1,4 @@
-@props(['for', 'text', 'type', 'id', 'name', 'placeholder'=>'', 'isRequired'=>'yes'])
+@props(['for', 'text', 'type', 'id', 'name', 'placeholder'=>'', 'isRequired'=>'yes', 'value'=>''])
 
 @php
     if($isRequired == 'yes'){
@@ -12,6 +12,6 @@
     @if($type == 'textarea')
         <textarea id='{{$id}}' name='{{$name}}' rows='4' class='w-full bg-white border border-gray-300 rounded-lg px-4 py-2' placeholder='{{$placeholder}}'></textarea>
     @else
-        <input type='{{$type}}' id='{{$id}}' name='{{$name}}' class='w-full bg-white border border-gray-300 rounded-lg px-4 py-2' placeholder='{{$placeholder}}'>
+        <input type='{{$type}}' id='{{$id}}' name='{{$name}}' class='w-full bg-white border border-gray-300 rounded-lg px-4 py-2' placeholder='{{$placeholder}}' value="{{$value}}">
     @endif
 </div>
