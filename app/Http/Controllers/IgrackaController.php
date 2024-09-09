@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Igracka;
+use App\Models\IgrackaBoje;
+use App\Models\IgrackaKombinacija;
 use Illuminate\Http\Request;
 
 class IgrackaController extends Controller
@@ -109,6 +111,66 @@ class IgrackaController extends Controller
                 'dimenzije',
                 'defaultBojaVunice',
                 'defaultBojaOciju'));
+    }
+
+
+    public function getIgrackaKombinacija()
+    {
+        $idIgracka = request()->input('idIgracka');
+        $idBojaVunice = request()->input('idBojaVunice');
+        $idBojaOciju = request()->input('idBojaOciju');
+        $idDimenzije = request()->input('idDimenzije');
+
+        $igracka = Igracka::find($idIgracka);
+
+        // Proveri da li si pronašao igračku
+        if (!$igracka) {
+            return response()->json(['error' => 'Igračka nije pronađena'], 404);
+        }
+
+        // Pronađi odgovarajući zapis u tabeli igracka_boje gde su povezani boje vunice i očiju
+        $igrackaBoje = IgrackaBoje::where('idIgracka', '=', $idIgracka)
+            ->where('idBojaVunice', '=', $idBojaVunice)
+            ->where('idBojaOciju', '=', $idBojaOciju)
+            ->first();
+
+        //return response()->json(['success' => $igrackaBoje], 200);
+
+
+        // Proveri da li si pronašao boje za igračku
+        if (!$igrackaBoje) {
+            return response()->json(['error' => 'Boje za igračku nisu pronađene'], 402);
+        }
+
+        $igrackaKombinacija = IgrackaKombinacija::where('idIgrBoje', '=', $igrackaBoje->idIgrBoje)
+            ->where('idDimenzije', '=', $idDimenzije)
+            ->first();
+
+        //return response()->json(['success' => $igrackaKombinacija], 200);
+
+        // Proveri da li si pronašao kombinaciju sa dimenzijama
+        if (!$igrackaKombinacija) {
+            return response()->json(['error' => 'Kombinacija nije pronađena'], 405);
+        }
+
+        return response()->json([
+            'idIgrKomb' => $igrackaKombinacija->idIgrKomb,
+        ]);
+
+//        if (!$igrackaBoje) {
+//            //return response()->json(['error' => 'Kombinacija nije pronađena'], 404);
+//            return response()->json([$igrackaBoje]);
+//        }
+
+//        if ($igrackaKombinacija) {
+//            return response()->json([
+//                'idIgrKomb' => $igrackaKombinacija->idIgrKomb,
+//                //'cena' => $igrackaKombinacija->cena_pravljenja
+//            ]);
+//        } else {
+//            return response()->json(['idIgrKomb' => $igrackaKombinacija->idIgrKomb]);
+//            //return response()->json(['error' => 'Kombinacija nije pronađena'], 404);
+//        }
     }
 
 }

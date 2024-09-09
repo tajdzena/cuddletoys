@@ -14,7 +14,11 @@
         <!-- Podaci za porudžbinu -->
         <div class="bg-brighter-peach rounded-lg shadow-lg p-6">
             <h2 class="text-lg font-bold text-dark-pink mb-4">Podaci za porudžbinu</h2>
-            <form action="#" method="POST">
+
+            <!-- Započni formu ovde, ali ne zatvaraj je do kraja -->
+            <form action="{{ route('zavrsiPorudzbinu') }}" method="POST">
+                @csrf
+
                 <!-- Koristi lične podatke sa profila -->
                 <div class="flex items-center mb-4">
                     <input type="checkbox" id="koristi-licne-podatke" class="mr-2">
@@ -37,21 +41,18 @@
                 <x-label-input for="adresa-placanja" text="Adresa plaćanja" type="text" id="adresa-placanja" name="adresa-placanja" placeholder="Beograd, Adresa 123, 11000"></x-label-input>
                 <x-label-input for="adresa-isporuke" text="Adresa isporuke" type="text" id="adresa-isporuke" name="adresa-isporuke" placeholder="Beograd, Adresa 123, 11000"></x-label-input>
 
-                <!-- Napomena -->
-                <p class="text-sm text-blue mt-8">* Molimo da u adresu upišeš grad, ulicu, broj i poštanski broj.</p>
-                <p class="text-sm text-blue">* Isporučujemo samo unutar Srbije.</p>
-            </form>
+                <!-- Zatvori formu u drugom divu -->
         </div>
 
-        <!-- Kartice za metod plaćanja, način dostave i ukupan iznos -->
+        <!-- Druga kolona sa metodom plaćanja, dostavom i ukupnim iznosom -->
         <div class="space-y-12">
             <!-- Metod plaćanja -->
             <div class="bg-brighter-peach rounded-lg shadow-lg p-6">
                 <h2 class="text-lg font-bold text-dark-pink mb-4">Metod plaćanja</h2>
                 <x-select id="metod-placanja" name="metod-placanja">
                     <x-option value="" isDisabled="yes">Izaberi metod plaćanja</x-option>
-                    <x-option value="kartica">Kartica</x-option>
-                    <x-option value="pouzece">Po preuzeću</x-option>
+                    <x-option value="1">Kartica</x-option>
+                    <x-option value="2">Po preuzeću</x-option>
                 </x-select>
             </div>
 
@@ -65,15 +66,41 @@
             <!-- Ukupan iznos -->
             <div class="bg-brighter-peach rounded-lg shadow-lg p-6">
                 <h2 class="text-lg font-bold text-dark-pink mb-2">Ukupan iznos: </h2>
-                <h2 class="text-lg font-bold text-dark-pink">4.000 RSD</h2>
+                <h2 class="text-lg font-bold text-dark-pink">{{ sprintf('%.2f', $ukupanIznos)}} RSD</h2>
+
+                <!-- Hidden input za ukupan iznos -->
+                <input type="hidden" id="ukupan_iznos" name="ukupan_iznos" value="{{ $ukupanIznos }}">
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-                    <a href="/korpa"><x-button type="submit" class="w-full h-12">Nazad na korpu</x-button></a>
-                    <a href="/racun"><x-button type="submit" class="w-full h-12">Poruči</x-button></a>
+                    <a href="/korpa"><x-button type="button" class="w-full h-12">Nazad na korpu</x-button></a>
+                    <x-button type="submit" class="w-full h-12">Poruči</x-button> <!-- Zatvori formu ovde -->
                 </div>
             </div>
+            </form>
         </div>
     </div>
 </x-glavni-div>
 
 <x-footer />
+
+<script>
+    $(document).ready(function() {
+        $('#koristi-licne-podatke').change(function() {
+            if ($(this).is(':checked')) {
+                // Ako je checkbox označen, popuni polja sa ličnim podacima
+                $('#ime').val('{{ Auth::user()->ime }}');
+                $('#prezime').val('{{ Auth::user()->prezime }}');
+                $('#mejl').val('{{ Auth::user()->mejl }}');
+                $('#adresa-placanja').val('{{ isset(Auth::user()->adresa_kor) ? Auth::user()->adresa_kor : '' }}');
+                $('#adresa-isporuke').val('{{ isset(Auth::user()->adresa_kor) ? Auth::user()->adresa_kor : '' }}');
+            } else {
+                // Ako se skine oznaka, očisti polja
+                $('#ime').val('');
+                $('#prezime').val('');
+                $('#mejl').val('');
+                $('#adresa-placanja').val('');
+                $('#adresa-isporuke').val('');
+            }
+        });
+    });
+</script>

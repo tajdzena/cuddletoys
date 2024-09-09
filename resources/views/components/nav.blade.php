@@ -5,6 +5,7 @@
     <meta name="viewport"
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <link rel="shortcut icon" type="image/x-icon" href="{{asset('favicon.ico')}}" />
 
@@ -13,6 +14,10 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Mulish:ital,wght@0,200..1000;1,200..1000&display=swap" rel="stylesheet">
+
+    <script src=
+                "https://code.jquery.com/jquery-3.6.0.min.js">
+    </script>
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
@@ -24,7 +29,7 @@
             <a href="/" class="-m-1.5 p-1.5">
                 <span class="sr-only">CuddleToys</span>
 {{--                <img class="h-8 w-auto" src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=600" alt="CuddleToys Logo">--}}
-                <img src="{{asset('images/logo/02-logo-cuddletoys.png')}}" class="h-10 w-auto" alt="CuddleToys">
+                <img src="{{asset('images/logo/02-logo-cuddletoys.png')}}" class="h-10 -ml-3 w-auto" alt="CuddleToys">
             </a>
 
             <!-- Hamburger Menu Button (Mobile) -->
@@ -96,7 +101,7 @@
     </nav>
 
     <!-- Mobile menu, hidden by default -->
-    <div id="mobile-menu" class="lg:hidden fixed inset-y-0 right-0 z-10 w-full overflow-y-auto bg-peach px-6 py-6 sm:max-w-sm sm:ring-1 sm:ring-gray-900/10 hidden">
+    <div id="mobile-menu" class="lg:hidden fixed inset-y-0 right-0 z-10 w-full overflow-y-auto bg-gradient-to-r from-pink via-lavender to-blue px-6 py-6 sm:max-w-sm sm:ring-1 sm:ring-gray-900/10 hidden">
         <div class="flex items-center justify-between">
             <a href="/" class="-m-1.5 p-1.5">
                 <span class="sr-only">CuddleToys</span>
@@ -129,8 +134,21 @@
                             </svg>
                         </button>
                         <div id="mobile-profile-dropdown-menu" class="-ml-1 mr-3 mt-2 bg-brighter-peach rounded-md shadow-lg py-2 hidden">
-                            <a href="/prijava" class="block px-4 py-2 text-sm text-dark-pink hover:bg-dark-pink/10">Prijavi se</a>
-                            <a href="/registracija" class="block px-4 py-2 text-sm text-dark-pink hover:bg-dark-pink/10">Registruj se</a>
+                            @auth
+                                <a href="/nalog" class="block px-4 py-2 text-sm text-dark-pink hover:bg-dark-pink/10">Moj nalog</a>
+                                <form action="{{ route('prijava.destroy') }}" method="POST">
+                                    @csrf
+                                    <button type="submit"
+                                            class="block w-full text-left px-4 py-2
+                                     @if (Request::is('nalog')) -mb-4 @endif
+                                    text-sm text-dark-pink hover:bg-dark-pink/10">Odjavi se</button>
+                                </form>
+                            @endauth
+
+                            @guest
+                                <a href="/prijava" class="block px-4 py-2 text-sm text-dark-pink hover:bg-dark-pink/10">Prijavi se</a>
+                                <a href="/registracija" class="block px-4 py-2 text-sm text-dark-pink hover:bg-dark-pink/10">Registruj se</a>
+                            @endguest
                         </div>
                     </div>
                     <x-mobile-nav-link putanja="../korpa">Korpa</x-mobile-nav-link>

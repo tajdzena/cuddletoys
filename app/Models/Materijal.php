@@ -34,4 +34,9 @@ class Materijal extends Model
         // Promena u ovoj liniji: Povezujemo se na IgrackaKombinacija preko IgrackaBoje
         return $this->hasManyThrough(MaterijalKombinacija::class, MaterijalBoja::class, 'idMaterijal', 'idMatBoja', 'idMaterijal', 'idMatBoja');
     }
+
+//    public function logProdaje()
+//    {
+//        return $this->hasMany(LogProdaje::class, 'idMaterijal');
+//    }
 }

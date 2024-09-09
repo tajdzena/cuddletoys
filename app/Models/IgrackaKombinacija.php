@@ -29,4 +29,13 @@ class IgrackaKombinacija extends Model
     {
         return $this->belongsTo(IgrackaBoje::class, 'idIgrBoje');
     }
+
+    public function stavkaKorpe(){
+        return $this->hasMany(StavkaKorpe::class, 'idIgrKomb');
+    }
+
+    public function logProdaje()
+    {
+        return $this->hasMany(LogProdaje::class, 'idIgrKomb');
+    }
 }

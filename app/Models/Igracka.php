@@ -34,4 +34,9 @@ class Igracka extends Model
         return $this->hasManyThrough(IgrackaKombinacija::class, IgrackaBoje::class, 'idIgracka', 'idIgrBoje', 'idIgracka', 'idIgrBoje');
     }
 
+//    public function logProdaje()
+//    {
+//        return $this->hasMany(LogProdaje::class, 'idIgracka');
+//    }
+
 }

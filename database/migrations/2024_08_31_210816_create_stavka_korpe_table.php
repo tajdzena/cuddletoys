@@ -17,7 +17,7 @@ return new class extends Migration
             $table->foreignId('idMatKomb')->nullable()->constrained('materijal_kombinacija', 'idMatKomb');
             $table->foreignId('idKorpa')->constrained('korpa', 'idKorpa')->cascadeOnDelete();
             //kad se izbrise idKorpe u Korpa, brise se i ovde stavka koja je vezana za tu korpu
-            $table->integer('kolicina_s');
+            $table->integer('kolicina_s')->default(1);
             $table->string('nacin_pravljenja');
             $table->timestamps();
         });

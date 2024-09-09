@@ -39,4 +39,9 @@ class MaterijalKombinacija extends Model
     public function slika(){
         return $this->belongsTo(Slika::class, 'idSlika', 'idSlika');
     }
+
+    public function logProdaje()
+    {
+        return $this->hasMany(LogProdaje::class, 'idMatKomb');
+    }
 }

@@ -25,9 +25,9 @@
                         $igracka->naziv_i = 'kornjaca';
                     }
                 @endphp
-                <img id="{{$igracka->naziv_i}}"
+                <img id="{{$igracka->idIgracka}}"
                      src="{{ asset('images/igracke/' . $igracka->naziv_i . '/' . $igracka->naziv_i . '-' . $defaultBojaVunice . '-' . $defaultBojaOciju . '.png') }}"
-                     alt="{{ ucfirst($igracka->naziv_i) }}"
+                     alt="{{ $igracka->naziv_i }}"
                      data-price="{{ $igracka->defaultKombinacija->cena_pravljenja ?? 0}}"
                      class="w-full h-62 object-cover rounded-md">
                 <img src="{{ asset('images/igracke/' . $igracka->naziv_i . '/' . $igracka->naziv_i . '2.png') }}"
@@ -57,6 +57,8 @@
             if($igracka->naziv_i == 'kornjaca'){
                 $igracka->naziv_i = 'kornjača';
             }
+
+            //dd($igracka->kombinacije->first()->idIgrKomb);
         @endphp
         <div class="flex flex-col justify-start mt-14">
             <h2 class="text-2xl font-bold text-purple mb-10 capitalize">{{ ucfirst($igracka->naziv_i) }}</h2>
@@ -69,8 +71,15 @@
                 </p>
 
                 <div class="ml-auto mr-7">
-                    <input type="number" min="1" value="1" class="mr-4 w-14 h-10 text-lg text-center border border-gray-300 rounded">
-                    <x-button type="submit" class="px-6 py-3 mb-4">Dodaj u korpu</x-button>
+                    <form action="{{ route('dodajUKorpu') }}" method="POST">
+                        @csrf
+                        <!-- Polje za idIgrKomb koji dolazi iz kombinacije -->
+                        <input type="hidden" name="idIgrKomb" value="1">
+                        <!-- Polje za količinu -->
+                        <input type="number" name="kolicina" min="1" value="{{ old('kolicina', 1) }}" class="mr-4 w-14 h-10 text-lg text-center border border-gray-300 rounded">
+                        <!-- Dugme za dodavanje u korpu -->
+                        <x-button type="submit" id="dodaj-u-korpu" class="px-6 py-3 mb-4">Dodaj u korpu</x-button>
+                    </form>
                 </div>
             </div>
 
@@ -81,7 +90,9 @@
                     <label for="boja_vunice" class="block text-dark-pink font-semibold mb-2">Boja vunice</label>
                     <x-select id="boja_vunice" name="boja_vunice" onchange="updateImage()">
                         @foreach($bojeVunice as $boja)
-                            <option value="{{ ($boja->boja->naziv_b) }}"
+                            <option
+                                    id="{{ $boja->idMatBoja }}"
+                                    value="{{ $boja->boja->naziv_b }}"
                                     class="capitalize"
                                     data-price="{{ $igracka->defaultBoje->bojaVunice->defaultKombinacija->cena_m ?? 0}}">
                                 {{ ucfirst($boja->boja->naziv_b) }}
@@ -94,7 +105,9 @@
                     <label for="boja_ociju" class="block text-dark-pink font-semibold mb-2">Boja očiju</label>
                     <x-select id="boja_ociju" name="boja_ociju" onchange="updateImage()">
                         @foreach($bojeOciju as $boja)
-                            <option value="{{ ($boja->boja->naziv_b) }}"
+                            <option
+                                    id="{{ $boja->idMatBoja }}"
+                                    value="{{ ($boja->boja->naziv_b) }}"
                                     class="capitalize"
                                     data-price="{{ $igracka->defaultBoje->bojaOciju->defaultKombinacija->cena_m ?? 0}}">
                                 {{ ucfirst($boja->boja->naziv_b) }}
@@ -109,7 +122,8 @@
                         @foreach($dimenzije as $dimenzija)
                             <option
                                 value="{{ $dimenzija['idDimenzije'] }}"
-                                data-price="{{ $dimenzija['cena_pravljenja'] ?? 0 }}">
+                                data-price="{{ $dimenzija['cena_pravljenja'] ?? 0 }}"
+                                name="{{$dimenzija['naziv_d']}}">
                                 {{ $dimenzija['naziv_d'] }}
                             </option>
                         @endforeach
@@ -134,14 +148,57 @@
         var oci = document.getElementById('boja_ociju').selectedOptions[0];
         var cenaOciju = parseFloat(oci.getAttribute('data-price')) || 0;
 
+        var selectDimenzija = document.getElementById('dimenzije');
+        //var dimenzija = selectDimenzija.options[selectDimenzija.selectedIndex];
+
+        $(document).ready(function() {
+            updateIdIgrKomb();
+
+            // Funkcija za ažuriranje idIgrKomb na osnovu izbora korisnika
+            function updateIdIgrKomb() {
+                var idVunice = document.getElementById('boja_vunice').options[document.getElementById('boja_vunice').selectedIndex].id;
+                var idOciju = document.getElementById('boja_ociju').options[document.getElementById('boja_ociju').selectedIndex].id;
+                var idDimenzije = selectDimenzija.options[selectDimenzija.selectedIndex].getAttribute('value');
+                var idIgracka = prviSlajder.id;
+
+                $.ajaxSetup({
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    }
+                });
+
+                console.log(idIgracka, idVunice, idOciju, idDimenzije);
+
+                // Napravi AJAX poziv na backend da dobiješ odgovarajući idIgrKomb
+                $.ajax({
+                    url: '/get-igracka-kombinacija', // Ruta za backend funkciju
+                    method: 'POST',
+                    data: {
+                        idIgracka: idIgracka,
+                        idBojaVunice: idVunice,
+                        idBojaOciju: idOciju,
+                        idDimenzije: idDimenzije
+                    },
+                    success: function(response) {
+                        // Ažuriraj hidden input polje za idIgrKomb
+                        console.log('Response:', response);
+                        console.log(response.idIgrKomb);
+                        document.querySelector('input[name="idIgrKomb"]').value = response.idIgrKomb;
+                    },
+                });
+
+
+                // Kada korisnik promeni boju vunice, očiju ili dimenzije, ponovo pokreni AJAX poziv
+                $('#boja_vunice, #boja_ociju, #dimenzije').on('change', function() {
+                    updateIdIgrKomb();
+                });
+            }
+        })
 
         function updateImage() {
             var bojaVunice = document.getElementById('boja_vunice').value.toLowerCase();
             var bojaOciju = document.getElementById('boja_ociju').value.toLowerCase();
-
-            var igrackaNaziv = prviSlajder.id.toLowerCase();
-
-            //console.log(igrackaNaziv);
+            var igrackaNaziv = prviSlajder.alt.toLowerCase();
 
             if(igrackaNaziv === 'žaba'){
                 igrackaNaziv = 'zaba'; //u putanji osisana latinica
@@ -159,10 +216,8 @@
         }
 
         function updatePrice() {
-            var selectDimenzija = document.getElementById('dimenzije');
             var dimenzija = selectDimenzija.options[selectDimenzija.selectedIndex];
             var cenaDimenzije = parseFloat(dimenzija.getAttribute('data-price')) || 0; //cena pravljenja
-
             //console.log(cenaDimenzije);
 
             // Izračunaj ukupnu cenu

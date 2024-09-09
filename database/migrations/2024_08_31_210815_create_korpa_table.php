@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('korpa', function (Blueprint $table) {
             $table->id('idKorpa');
             $table->foreignId('idKorisnik')->constrained('korisnik', 'idKorisnik')->cascadeOnDelete();
-            $table->float('ukupna_cena');
+            $table->float('ukupna_cena')->default(0.0);
             $table->timestamps();
         });
     }
