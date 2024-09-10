@@ -8,11 +8,12 @@
         <div class="flex items-center">
             <img src="{{ $image }}" alt="{{ $naziv }}" class="w-16 h-16 rounded-md">
             <div class="ml-4">
-                <p class="text-dark-pink font-semibold">{{ $naziv }}</p>
                 @if($vrsta == 'igracka')
+                    <p class="text-dark-pink font-semibold"><a class="hover:underline" href="igracke/{{$stavka->igracka->boje->igracka->idIgracka}}">{{ $naziv }}</a></p>
                     <p class='text-blue font-semibold'>Boja vunice: {{ $boja_vunice }}</p>
                     <p class='text-blue font-semibold'>Boja očiju: {{ $boja_ociju }}</p>
                 @elseif($vrsta == 'materijal')
+                    <p class="text-dark-pink font-semibold"><a class="hover:underline" href="materijali/{{$stavka->materijal->materijalBoja->materijal->idMaterijal}}">{{ $naziv }}</a></p>
                     <p class='text-blue font-semibold'>Boja materijala: {{ $boja_mat }}</p>
                 @endif
                 <p class='text-blue font-semibold'>Dimenzije: {{ $dimenzije }}</p>
@@ -52,7 +53,7 @@
         <form action="{{ route('ukloni', ['id' => $stavka->idStavka]) }}" method="POST">
             @csrf
             @method('DELETE')
-            <button type="submit" class="text-red-600 hover:text-red-900 block">Ukloni</button>
+            <button type="submit" class="ukloni-stavku-btn text-red-600 hover:text-red-900 block">Ukloni</button>
         </form>
     </td>
 </tr>

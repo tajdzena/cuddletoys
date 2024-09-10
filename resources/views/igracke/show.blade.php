@@ -84,7 +84,7 @@
             </div>
 
             <!-- Opcije za prilagođavanje -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-11">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-11 mb-4">
                 <!-- Boja vunice -->
                 <div>
                     <label for="boja_vunice" class="block text-dark-pink font-semibold mb-2">Boja vunice</label>
@@ -131,7 +131,16 @@
                 </div>
             </div>
 
-            <p class="mt-8 text-blue">Imaš posebne zahteve za pravljenje igračke? <a href="/kontakt" class="text-hot-pink underline">Piši nam</a>.</p>
+            <div class="flex flex-row justify-between">
+                <p class="mt-28 text-blue">Imaš posebne zahteve za pravljenje igračke? <a href="/kontakt" class="text-hot-pink underline">Piši nam</a>.</p>
+
+                @canany(['isAdmin', 'isModerator'], Auth::user())
+                    <a href="{{ route('igracke.edit', ['id' => $igracka->idIgracka]) }}">
+                        <button class="mt-24 h-10 w-20 bg-pink text-dark-pink rounded ml-auto mr-8 hover:bg-pink/50">Izmeni</button>
+                    </a>
+                @endcanany
+            </div>
+
         </div>
     </div>
 </x-glavni-div>
@@ -191,6 +200,43 @@
                 // Kada korisnik promeni boju vunice, očiju ili dimenzije, ponovo pokreni AJAX poziv
                 $('#boja_vunice, #boja_ociju, #dimenzije').on('change', function() {
                     updateIdIgrKomb();
+                });
+            }
+
+            // Kada korisnik pošalje formu za dodavanje u korpu
+            $('form').on('submit', function(event) {
+                event.preventDefault(); // Spreči da se stranica osveži
+
+                let formData = $(this).serialize(); // Uzmi podatke iz forme
+
+                $.ajax({
+                    url: $(this).attr('action'), // URL iz action atributa forme
+                    method: $(this).attr('method'), // Metoda iz method atributa
+                    data: formData,
+                    success: function(response) {
+                        if (response.success) {
+                            // Prikaži poruku o uspešnom dodavanju
+                            showPopupMessage(response.message);
+                        }
+                    },
+                    error: function() {
+                        showPopupMessage('Došlo je do greške pri dodavanju proizvoda u korpu.');
+                    }
+                });
+            });
+
+            // Funkcija za prikazivanje pop-up poruke
+            function showPopupMessage(message) {
+                // Kreiraj element za prikazivanje poruke
+                let popup = $('<div></div>')
+                    .addClass('popup-message bg-green/30 text-green py-2 px-4 rounded shadow-md')
+                    .text(message)
+                    .hide()
+                    .appendTo('body');
+
+                // Prikaži poruku
+                popup.fadeIn(200).delay(3000).fadeOut(400, function() {
+                    $(this).remove(); // Ukloni poruku nakon što se ugasi
                 });
             }
         })

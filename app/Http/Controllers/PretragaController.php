@@ -65,7 +65,10 @@ class PretragaController extends Controller
                 });
                 break;
             case '5': // Najnoviji
-                $combined = $combined->sortByDesc('created_at');
+                $combined = $combined->sortByDesc(function ($item) {
+                    return $item->idIgracka ?? $item->idMaterijal;
+                });
+                break;
                 break;
             default: // Default sortiranje po nazivu
                 $combined = $combined->sortBy(function ($item) {

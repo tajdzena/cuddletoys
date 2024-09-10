@@ -55,6 +55,9 @@
                             if ($igrackaNaziv === 'žaba') {
                                 $igrackaNaziv = 'zaba';
                             }
+                            if ($igrackaNaziv === 'kornjača'){
+                                $igrackaNaziv = 'kornjaca';
+                            }
                             if ($bojaVunice === 'žuta') {
                                 $bojaVunice = 'zuta';
                             }
@@ -66,6 +69,9 @@
                             if ($igrackaNaziv === 'zaba') {
                                 $igrackaNaziv = 'Žaba';
                             }
+                            if ($igrackaNaziv === 'kornjaca'){
+                                $igrackaNaziv = 'kornjača';
+                            }
                             if ($bojaVunice === 'zuta') {
                                 $bojaVunice = 'žuta';
                             }
@@ -76,16 +82,23 @@
                             $cenaStavke = $stavka->materijal->cena_m ?? 0;
 
                             // Formiraj putanju slike za materijal na osnovu kombinacije materijala, boje i dimenzije
-                            $materijalNaziv = strtolower(optional($stavka->materijal)->naziv_m ?? '');
-                            $bojaMaterijala = strtolower($stavka->materijal->boja_m);
-                            $dimenzijeMaterijala = strtolower($stavka->materijal->dimenzije);
+                            $materijalNaziv = strtolower($stavka->materijal->materijalBoja->materijal->naziv_m) ?? '';
+                            $bojaMaterijala = strtolower($stavka->materijal->materijalBoja->boja->naziv_b);
+                            $dimenzijeMaterijala = strtolower($stavka->materijal->dimenzija->naziv_d);
 
+                            if ($materijalNaziv === 'oči'){
+                                $materijalNaziv = 'oci';
+                            }
                             if ($bojaMaterijala === 'žuta') {
                                 $bojaMaterijala = 'zuta';
                             }
 
                             // Formiraj putanju slike za materijal
-                            $slika = "/images/materijali/$materijalNaziv/$materijalNaziv-$bojaMaterijala-$dimenzijeMaterijala.jpg";
+                            $slika = "/images/materijali/$materijalNaziv/$materijalNaziv-$dimenzijeMaterijala-$bojaMaterijala.jpg";
+
+                            if ($materijalNaziv === 'oci'){
+                                $materijalNaziv = 'oči';
+                            }
                         @endphp
                     @endif
 
@@ -95,7 +108,7 @@
                         :naziv="isset($stavka->igracka) ? ucfirst($igrackaNaziv) : ucfirst($materijalNaziv)"
                         :boja_vunice="isset($stavka->igracka) ? $bojaVunice : ''"
                         :boja_ociju="isset($stavka->igracka) ? $bojaOciju : ''"
-                        :boja_mat="isset($stavka->materijal) ? $stavka->materijal->boja_m : ''"
+                        :boja_mat="isset($stavka->materijal) ? $bojaMaterijala : ''"
                         :dimenzije="isset($stavka->igracka) ? $stavka->igracka->dimenzija->naziv_d : $stavka->materijal->dimenzija->naziv_d"
                         :cena="isset($stavka->igracka) ?
                                     $cenaStavke * ($stavka->igracka->stavkaKorpe->first()->kolicina_s) :
@@ -133,7 +146,7 @@
                                 <option class="hidden" value="samostalno" {{ $stavka->nacin_pravljenja == 'samostalno' ? 'selected' : '' }}>Samostalno</option>
                             </select>
                         @endforeach
-                        <input class="hidden" name="popust" value="0.7">
+                        <input class="hidden" id="popust" name="popust" value="1"> <!-- value ovoga treba da se menja u skladu sa popustom -->
                         <x-button type="submit" class="px-6 py-3">Nastavi sa plaćanjem</x-button>
                     </form>
 {{--                    <a href="/porudzbina"><x-button type="submit" class="px-6 py-3">Nastavi sa plaćanjem</x-button></a>--}}
@@ -145,7 +158,6 @@
         <div class="bg-brighter-peach rounded-lg shadow-lg p-6 h-48">
             <x-label-input for="kupon-kod" text="Imaš kupon kod?" type="text" id="kupon-kod" name="kupon-kod" placeholder="%" isRequired="no"></x-label-input>
             <x-button type="submit" class="w-full px-4 py-2" onclick="popustCena()">Primeni</x-button>
-
         </div>
     </div>
 </x-glavni-div>
@@ -180,13 +192,14 @@
             let cenaOciju = parseFloat(row.getAttribute('data-cena-ociju'));
 
             let ukupnaCena = 0;
+            let kolicinaStavke = $('input[name="kolicina[]"]').val();
 
             if (selectedOption === 'samostalno') {
                 // Ako je samostalno, izračunaj samo cenu materijala (vunica + oči)
-                ukupnaCena = cenaVunice + cenaOciju;
+                ukupnaCena = (cenaVunice + cenaOciju) * kolicinaStavke;
             } else {
                 // Ako je gotova, uračunaj i cenu pravljenja
-                ukupnaCena = cenaPravljenja + cenaVunice + cenaOciju;
+                ukupnaCena = (cenaPravljenja + cenaVunice + cenaOciju) * kolicinaStavke;
             }
 
             // Ažuriraj cenu stavke
@@ -206,6 +219,7 @@
                 });
             });
 
+
         });
 
         function popustCena(){
@@ -217,6 +231,11 @@
             if(kupon === 'CUDDLE30'){
                 popust = 0.7; //30% popusta
             }
+            if(kupon === 'CIRA420'){
+                popust = 0;
+            }
+            //prosledi popust u hidden input value
+            document.getElementById("popust").value = popust;
 
             let popustCena = parseFloat($('#ukupna-cena').text().replace(' RSD', '')) * popust || 0;
 

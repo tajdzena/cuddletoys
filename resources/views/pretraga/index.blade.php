@@ -51,6 +51,12 @@
                     :alt="ucfirst($product->naziv_i)"
                     :naziv="ucfirst($product->naziv_i)"
                     :cena="isset($product->ukupnaCena) ? ('Od ' . sprintf('%.2f', $product->ukupnaCena) . ' RSD') : '/ RSD'">
+                    <form class="add-to-cart-form" method="POST" action="{{ route('dodajUKorpu') }}">
+                        @csrf
+                        <input type="hidden" name="idIgrKomb" value="{{ $product->defaultKombinacija->idIgrKomb }}">
+                        <input type="hidden" name="kolicina" value="1">
+                        <x-button type="submit" class="mt-4 px-4 py-2">Dodaj u korpu</x-button>
+                    </form>
                 </x-card-proizvod>
             @elseif($product instanceof \App\Models\Materijal)
                 <!-- Prikaz materijala -->
@@ -60,6 +66,12 @@
                     :alt="ucfirst($product->naziv_m)"
                     :naziv="ucfirst($product->naziv_m)"
                     :cena="isset($product->defaultKombinacija->cena_m) ? ('Od ' . sprintf('%.2f', $product->defaultKombinacija->cena_m) . ' RSD') : '/ RSD'">
+                    <form class="add-to-cart-form" method="POST" action="{{ route('dodajUKorpu') }}">
+                        @csrf
+                        <input type="hidden" name="idMatKomb" value="{{ $product->defaultKombinacija->idMatKomb }}">
+                        <input type="hidden" name="kolicina" value="1">
+                        <x-button type="submit" class="mt-4 px-4 py-2">Dodaj u korpu</x-button>
+                    </form>
                 </x-card-proizvod>
             @endif
         @endforeach
@@ -73,3 +85,44 @@
 </x-glavni-div>
 
 <x-footer />
+
+<script>
+    $(document).ready(function () {
+        // Kada korisnik pošalje formu za dodavanje u korpu
+        $('.add-to-cart-form').on('submit', function(event) {
+            event.preventDefault(); // Spreči da se stranica osveži
+
+            let formData = $(this).serialize(); // Uzmi podatke iz forme
+
+            $.ajax({
+                url: $(this).attr('action'), // URL iz action atributa forme
+                method: $(this).attr('method'), // Metoda iz method atributa
+                data: formData,
+                success: function(response) {
+                    if (response.success) {
+                        // Prikaži poruku o uspešnom dodavanju
+                        showPopupMessage(response.message);
+                    }
+                },
+                error: function() {
+                    showPopupMessage('Došlo je do greške pri dodavanju proizvoda u korpu.');
+                }
+            });
+        });
+
+        // Funkcija za prikazivanje pop-up poruke
+        function showPopupMessage(message) {
+            // Kreiraj element za prikazivanje poruke
+            let popup = $('<div></div>')
+                .addClass('popup-message bg-yellow/80 text-green py-2 px-4 rounded shadow-md')
+                .text(message)
+                .hide()
+                .appendTo('body');
+
+            // Prikaži poruku
+            popup.fadeIn(200).delay(3000).fadeOut(400, function() {
+                $(this).remove(); // Ukloni poruku nakon što se ugasi
+            });
+        }
+    });
+</script>

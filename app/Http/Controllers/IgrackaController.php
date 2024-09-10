@@ -46,7 +46,7 @@ class IgrackaController extends Controller
                 $query = $query->orderBy('naziv_i', 'desc');
                 break;
             case '5':
-                $query = $query->latest();  // Sortiranje po najnovijim
+                $query = $query->orderBy('idIgracka', 'desc');  // Sortiranje po najnovijim, sto veci id to su novije, nemaju sve created_at
                 break;
             default:
                 $query = $query->orderBy('naziv_i', 'asc');  // Default sortiranje
@@ -134,8 +134,6 @@ class IgrackaController extends Controller
             ->where('idBojaOciju', '=', $idBojaOciju)
             ->first();
 
-        //return response()->json(['success' => $igrackaBoje], 200);
-
 
         // Proveri da li si pronašao boje za igračku
         if (!$igrackaBoje) {
@@ -146,7 +144,6 @@ class IgrackaController extends Controller
             ->where('idDimenzije', '=', $idDimenzije)
             ->first();
 
-        //return response()->json(['success' => $igrackaKombinacija], 200);
 
         // Proveri da li si pronašao kombinaciju sa dimenzijama
         if (!$igrackaKombinacija) {
@@ -156,21 +153,42 @@ class IgrackaController extends Controller
         return response()->json([
             'idIgrKomb' => $igrackaKombinacija->idIgrKomb,
         ]);
+    }
 
-//        if (!$igrackaBoje) {
-//            //return response()->json(['error' => 'Kombinacija nije pronađena'], 404);
-//            return response()->json([$igrackaBoje]);
-//        }
 
-//        if ($igrackaKombinacija) {
-//            return response()->json([
-//                'idIgrKomb' => $igrackaKombinacija->idIgrKomb,
-//                //'cena' => $igrackaKombinacija->cena_pravljenja
-//            ]);
-//        } else {
-//            return response()->json(['idIgrKomb' => $igrackaKombinacija->idIgrKomb]);
-//            //return response()->json(['error' => 'Kombinacija nije pronađena'], 404);
-//        }
+    public function edit($id){
+
+        $igracka = Igracka::find($id);
+        $igrackaNaziv = $igracka->naziv_i;
+        $igrackaOpis = $igracka->opis_i;
+
+        return view('igracke.edit', compact('igracka', 'igrackaNaziv', 'igrackaOpis'));
+    }
+
+    public function update($id){
+
+        $naziv = request()->input('naziv');
+        $opis = request()->input('opis');
+
+        $igracka = Igracka::find($id);
+
+        $igracka->naziv_i = $naziv;
+        $igracka->opis_i = $opis;
+
+        $igracka->save();
+
+        return redirect()->route('igracke.show', ['id' => $id]);
+    }
+
+
+    public function delete($id){
+
+        $igracka = Igracka::find($id);
+        dd($igracka->naziv_i . ' je obrisan/a!');
+
+        $igracka->delete();
+
+        return redirect()->route('igracke.index');
     }
 
 }

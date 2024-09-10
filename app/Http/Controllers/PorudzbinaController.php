@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\IgrackaBoje;
+use App\Models\IgrackaKombinacija;
 use App\Models\Korpa;
 use App\Models\LogProdaje;
+use App\Models\MaterijalKombinacija;
 use App\Models\Posiljka;
 use App\Models\Racun;
 use App\Models\StavkaKorpe;
@@ -51,7 +54,8 @@ class PorudzbinaController extends Controller{
 //        dd($stavkaKorpe);
 
         // Optionally return a success message or redirect to the cart page
-        return redirect()->route('porudzbine.korpa')->with('success', 'Proizvod je uspešno dodat u korpu.');
+        //return redirect()->route('porudzbine.korpa')->with('success', 'Proizvod je uspešno dodat u korpu.');
+        return response()->json(['success' => true, 'message' => 'Proizvod je uspešno dodat u korpu!']);
     }
 
     public function korpa()
@@ -63,10 +67,15 @@ class PorudzbinaController extends Controller{
 
         if ($korpa) {
             $stavkeKorpe = $korpa->stavke;
+            //dd($stavkeKorpe);
             $ukupnaCena = 0;
 
             // Izračunaj ukupnu cenu sabiranjem cena svih stavki
             foreach ($stavkeKorpe as $stavka) {
+                if($stavka->nacin_pravljenja == 'samostalno'){
+                    $stavka->igracka->cena_pravljenja = 0;
+                }
+
                 if (isset($stavka->igracka)) {
                     $cenaStavke = ($stavka->igracka->cena_pravljenja +
                         $stavka->igracka->boje->bojaVunice->kombinacije->first()->cena_m +
@@ -201,14 +210,58 @@ class PorudzbinaController extends Controller{
             'idKorisnik' => $korisnik->getAuthIdentifier(),
         ]);
 
-        // Zapis u LogProdaje
+
         foreach ($korpa->stavke as $stavka) {
+
+            // Zapis u LogProdaje
             LogProdaje::create([
                 'idKorisnik' => $korisnik->getAuthIdentifier(),
                 'idIgrKomb' => $stavka->idIgrKomb,
                 'idMatKomb' => $stavka->idMatKomb,
                 'idRacun' => $racun->idRacun,
             ]);
+
+            // Ako je stavka materijal, smanji kolicinu
+            if ($stavka->idMatKomb) {
+                // Smanji količinu za taj materijal
+                $materijalKombinacija = MaterijalKombinacija::find($stavka->idMatKomb);
+                if ($materijalKombinacija) {
+                    $materijalKombinacija->kolicina_m -= $stavka->kolicina_s;
+                    $materijalKombinacija->save();
+                }
+            }
+
+            // Ako je stavka igračka
+            if ($stavka->idIgrKomb) {
+                $igrackaKombinacija = IgrackaKombinacija::find($stavka->idIgrKomb);
+                if ($igrackaKombinacija) {
+                    // Nađi boje za vunicu i oči iz igracka_boje
+                    $igrackaBoje = IgrackaBoje::find($igrackaKombinacija->idIgrBoje);
+                    if ($igrackaBoje) {
+
+                        // Pronađi materijal za vunicu (koristi 1m po igrački)
+                        $vunicaKombinacija = MaterijalKombinacija::where('idMatBoja', $igrackaBoje->idBojaVunice)
+                            ->where('idDimenzije', 13) // 13 - 1m
+                            ->first();
+
+                        if ($vunicaKombinacija) {
+                            $vunicaKombinacija->kolicina_m -= 1 * $stavka->kolicina_s;
+                            $vunicaKombinacija->save();
+                        }
+
+                        // Pronađi materijal za oči (koristi 2cm po igrački)
+                        $ociKombinacija = MaterijalKombinacija::where('idMatBoja', $igrackaBoje->idBojaOciju)
+                            ->where('idDimenzije', 10) // 10 - 2cm
+                            ->first();
+
+                        if ($ociKombinacija) {
+                            $ociKombinacija->kolicina_m -= 1 * $stavka->kolicina_s;
+                            $ociKombinacija->save();
+                        }
+                    }
+                }
+            }
+
         }
 
         // Isprazni korpu
@@ -226,6 +279,6 @@ class PorudzbinaController extends Controller{
             return redirect()->route('racun')->with('error', 'Nema dostupnog računa.');
         }
 
-        return view('racun');
+        return view('porudzbine.racun', compact('racun'));
     }
 }

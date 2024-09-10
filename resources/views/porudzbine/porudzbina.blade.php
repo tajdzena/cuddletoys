@@ -41,7 +41,7 @@
                 <x-label-input for="adresa-placanja" text="Adresa plaćanja" type="text" id="adresa-placanja" name="adresa-placanja" placeholder="Beograd, Adresa 123, 11000"></x-label-input>
                 <x-label-input for="adresa-isporuke" text="Adresa isporuke" type="text" id="adresa-isporuke" name="adresa-isporuke" placeholder="Beograd, Adresa 123, 11000"></x-label-input>
 
-                <!-- Zatvori formu u drugom divu -->
+                <!-- validaciju odraditi -->
         </div>
 
         <!-- Druga kolona sa metodom plaćanja, dostavom i ukupnim iznosom -->

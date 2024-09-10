@@ -31,6 +31,10 @@ class LogProdaje extends Model
         return $this->belongsTo(MaterijalKombinacija::class, 'idMatKomb');
     }
 
+    public function racun(){
+        return $this->belongsTo(Racun::class, 'idRacun');
+    }
+
 //    public function igracka()
 //    {
 //        return $this->belongsTo(Igracka::class, 'idIgracka');

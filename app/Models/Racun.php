@@ -25,4 +25,10 @@ class Racun extends Model
     {
         return $this->belongsTo(MetodPlacanja::class, 'idMetodPlacanja');
     }
+
+
+    public function logProdaje()
+    {
+        return $this->hasMany(LogProdaje::class, 'idRacun', 'idRacun');
+    }
 }

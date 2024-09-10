@@ -18,9 +18,9 @@
                         $materijal->naziv_m = 'oci';
                     }
                 @endphp
-                <img id="{{$materijal->naziv_m}}"
+                <img id="{{$materijal->idMaterijal}}"
                      src="{{ asset('images/materijali/' . $materijal->naziv_m . '/' . $materijal->naziv_m . '-' . $materijal->defaultKombinacija->dimenzija->naziv_d . '-' . $defaultBojaMaterijala . '.jpg') }}"
-                     alt="{{ ucfirst($materijal->naziv_m) }}"
+                     alt="{{ ($materijal->naziv_m) }}"
                      class="w-full h-62 object-cover rounded-md">
                 <img id="{{$materijal->naziv_m}}"
                      src="{{ asset('images/materijali/' . $materijal->naziv_m . '/' . $materijal->naziv_m . '.jpg') }}"
@@ -53,19 +53,27 @@
                 </p>
 
                 <div class="ml-auto mr-7">
-                    <input type="number" min="1" value="1" class="mr-4 w-14 h-10 text-lg text-center border border-gray-300 rounded">
-                    <x-button type="submit" class="px-6 py-3 mb-4">Dodaj u korpu</x-button>
+                    <form action="{{ route('dodajUKorpu') }}" method="POST">
+                        @csrf
+                        <!-- Polje za idMatKomb koji dolazi iz kombinacije -->
+                        <input type="hidden" name="idMatKomb" value="1">
+                        <input type="number" name="kolicina" min="1" value="{{ old('kolicina', 1) }}" class="mr-4 w-14 h-10 text-lg text-center border border-gray-300 rounded">
+                        <x-button type="submit" id="dodaj-u-korpu" class="px-6 py-3 mb-4">Dodaj u korpu</x-button>
+                    </form>
                 </div>
             </div>
 
             <!-- Opcije za prilagođavanje -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-11">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-11 mb-4">
                 <!-- Boja materijala -->
                 <div>
                     <label for="boja_materijala" class="block text-dark-pink font-semibold mb-2">Boja materijala</label>
                     <x-select id="boja_materijala" name="boja_materijala" onchange="updateImage()">
                         @foreach($bojeMaterijala as $boja)
-                            <option value="{{ ($boja->naziv_b) }}" class="capitalize">
+                            <option
+                                id="{{$boja->idBoja}}"
+                                value="{{ ($boja->naziv_b) }}"
+                                class="capitalize">
                                 {{ ucfirst($boja->naziv_b) }}
                             </option>
                         @endforeach
@@ -86,6 +94,16 @@
                     </x-select>
                 </div>
             </div>
+
+            <div class="flex flex-row justify-between">
+                <p class="mt-28 text-blue">Imaš posebne zahteve za pravljenje materijala? <a href="/kontakt" class="text-hot-pink underline">Piši nam</a>.</p>
+
+                @canany(['isAdmin', 'isModerator'], Auth::user())
+                    <a href="{{ route('materijali.edit', ['id' => $materijal->idMaterijal]) }}">
+                        <button class="mt-24 h-10 w-20 bg-pink text-dark-pink rounded ml-auto mr-8 hover:bg-pink/50">Izmeni</button>
+                    </a>
+                @endcanany
+            </div>
         </div>
     </div>
 </x-glavni-div>
@@ -95,40 +113,145 @@
 @verbatim
     <script>
         var prviSlajder = document.querySelector('#slider img:first-child');
+        var selectDimenzija = document.getElementById('dimenzije');
 
-        function updateBoje() {
-            var idDimenzije = document.getElementById('dimenzije').value;
+        $(document).ready(function() {
+            updateIdMatKomb();
 
-            fetch(`/materijal-boje/${idDimenzije}`)
-                .then(response => response.json())
-                .then(data => {
-                    var selectBoja = document.getElementById('boja_materijala');
-                    selectBoja.innerHTML = ''; // Očisti trenutne boje
+            // Funkcija za ažuriranje idIgrKomb na osnovu izbora korisnika
+            function updateIdMatKomb() {
+                var idBoja = document.getElementById('boja_materijala').options[document.getElementById('boja_materijala').selectedIndex].id;
+                var idDimenzije = selectDimenzija.options[selectDimenzija.selectedIndex].getAttribute('value');
+                var idMaterijal = prviSlajder.id;
 
-                    if (data.boje.length > 0) {
-                        data.boje.forEach(boja => {
-                            var option = document.createElement('option');
-                            option.value = boja.naziv_b;
-                            option.text = boja.naziv_b.charAt(0).toUpperCase() + boja.naziv_b.slice(1);
-                            selectBoja.appendChild(option);
-                        });
+                console.log(idBoja);
+                console.log(idDimenzije);
+                console.log(idMaterijal);
 
-                        // Postavi prvu boju kao default nakon promene dimenzije
-                        selectBoja.selectedIndex = 0;
-
-                        // Automatski ažuriraj sliku koristeći prvu boju iz novog seta boja
-                        updateImage();
+                $.ajaxSetup({
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                     }
                 });
-        }
+
+                // Napravi AJAX poziv na backend da dobiješ odgovarajući idIgrKomb
+                $.ajax({
+                    url: '/get-materijal-kombinacija', // Ruta za backend funkciju
+                    method: 'POST',
+                    data: {
+                        idMaterijal: idMaterijal,
+                        idBoja: idBoja,
+                        idDimenzije: idDimenzije
+                    },
+                    success: function (response) {
+                        // Ažuriraj hidden input polje za idIgrKomb
+                        console.log('Response:', response);
+                        console.log(response.idMatKomb);
+                        document.querySelector('input[name="idMatKomb"]').value = response.idMatKomb;
+                    },
+                    error: function (xhr, status, error) {
+                        console.log('Greška prilikom povlačenja kombinacije:', error);
+                    }
+                });
+
+
+                // // Kada korisnik promeni boju ili dimenzije, ponovo pokreni AJAX poziv
+                // $('#boja_materijala, #dimenzije').on('change', function () {
+                //     updateIdMatKomb();
+                // });
+            }
+
+            // Ažuriraj boje kada se promeni dimenzija, a zatim ažuriraj ID kombinacije
+            function updateBoje() {
+                var idDimenzije = document.getElementById('dimenzije').value;
+
+                fetch(`/materijal-boje/${idDimenzije}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        var selectBoja = document.getElementById('boja_materijala');
+                        selectBoja.innerHTML = ''; // Očisti trenutne boje
+
+                        if (data.boje.length > 0) {
+                            data.boje.forEach(boja => {
+                                var option = document.createElement('option');
+                                option.value = boja.naziv_b;
+                                option.id = boja.idBoja;  // Dodaj ID boje
+                                option.text = boja.naziv_b.charAt(0).toUpperCase() + boja.naziv_b.slice(1);
+                                selectBoja.appendChild(option);
+                            });
+
+                            // Postavi prvu boju kao default nakon promene dimenzije
+                            selectBoja.selectedIndex = 0;
+
+                            // Ažuriraj sliku koristeći prvu boju iz novog seta boja
+                            updateImage();
+
+                            // Nakon što su boje ažurirane, pozovi funkciju za ažuriranje kombinacije
+                            updateIdMatKomb();
+                        }
+                    })
+                    .catch(error => console.error('Greška prilikom osvežavanja boja:', error));
+            }
+
+
+            // Kada korisnik promeni dimenziju, prvo osveži boje, a zatim ažuriraj kombinaciju
+            $('#dimenzije').on('change', function () {
+                updateBoje();
+                updatePrice();
+            });
+
+            // Kada korisnik promeni boju, odmah ažuriraj kombinaciju
+            $('#boja_materijala').on('change', function () {
+                updateIdMatKomb();
+            });
+
+
+            // Kada korisnik pošalje formu za dodavanje u korpu
+            $('form').on('submit', function(event) {
+                event.preventDefault(); // Spreči da se stranica osveži
+
+                let formData = $(this).serialize(); // Uzmi podatke iz forme
+
+                $.ajax({
+                    url: $(this).attr('action'), // URL iz action atributa forme
+                    method: $(this).attr('method'), // Metoda iz method atributa
+                    data: formData,
+                    success: function(response) {
+                        if (response.success) {
+                            // Prikaži poruku o uspešnom dodavanju
+                            showPopupMessage(response.message);
+                        }
+                    },
+                    error: function() {
+                        showPopupMessage('Došlo je do greške pri dodavanju proizvoda u korpu.');
+                    }
+                });
+            });
+
+            // Funkcija za prikazivanje pop-up poruke
+            function showPopupMessage(message) {
+                // Kreiraj element za prikazivanje poruke
+                let popup = $('<div></div>')
+                    .addClass('popup-message bg-green/30 text-green py-2 px-4 rounded shadow-md')
+                    .text(message)
+                    .hide()
+                    .appendTo('body');
+
+                // Prikaži poruku
+                popup.fadeIn(200).delay(3000).fadeOut(400, function() {
+                    $(this).remove(); // Ukloni poruku nakon što se ugasi
+                });
+            }
+
+        })
 
         function updateImage() {
             var bojaMaterijala = document.getElementById('boja_materijala').value.toLowerCase();
-            var materijalNaziv = prviSlajder.id.toLowerCase();
+            var materijalNaziv = prviSlajder.alt.toLowerCase();
 
             var selectDimenzija = document.getElementById('dimenzije').selectedOptions[0];
             var dimenzijaNaziv = selectDimenzija.getAttribute('name').toLowerCase();
-            //onsole.log(dimenzijaNaziv);
+            //console.log(dimenzijaNaziv);
 
             if(bojaMaterijala === 'žuta'){
                 bojaMaterijala = 'zuta';
@@ -136,7 +259,7 @@
 
             // Formiranje putanje slike
             var novaPutanja = "/images/materijali/" + materijalNaziv + "/" + materijalNaziv + "-" + dimenzijaNaziv + "-" + bojaMaterijala + ".jpg";
-            console.log(novaPutanja);
+            //console.log(novaPutanja);
             document.querySelector('#slider img:first-child').src = novaPutanja;
         }
 

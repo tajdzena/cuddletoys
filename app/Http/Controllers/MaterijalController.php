@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Materijal;
+use App\Models\MaterijalBoja;
 use App\Models\MaterijalKombinacija;
 use Illuminate\Http\Request;
 
@@ -11,9 +12,6 @@ class MaterijalController extends Controller
     public function index(Request $request)
     {
         // Prikaz svih materijala
-//        $materijali = Materijal::with(['defaultKombinacija'])
-//            ->get();
-//        return view('materijali.index', ['materijali' => $materijali]);
 
         $sortOption = $request->input('sort');
 
@@ -43,7 +41,7 @@ class MaterijalController extends Controller
                 $query = $query->orderBy('naziv_m', 'desc');
                 break;
             case '5':
-                $query = $query->latest();  // Sortiranje po najnovijim
+                $query = $query->orderBy('idMaterijal', 'desc');
                 break;
             default:
                 $query = $query->orderBy('naziv_m', 'asc');  // Default sortiranje
@@ -103,5 +101,71 @@ class MaterijalController extends Controller
             ->unique('idBoja');
 
         return response()->json(['boje' => $boje]);
+    }
+
+
+    public function getMaterijalKombinacija(){
+        $idMaterijal = request()->input('idMaterijal');
+        $idBoja = request()->input('idBoja');
+        $idDimenzije = request()->input('idDimenzije');
+
+        $materijal = Materijal::find($idMaterijal);
+
+        if (!$materijal) {
+            return response()->json(['error' => 'Materijal nije pronađen'], 403);
+        }
+
+        $materijalBoja = MaterijalBoja::where('idBoja', '=', $idBoja)
+            ->where('idMaterijal', '=', $idMaterijal)
+            ->first();
+
+        $materijalKombinacija = MaterijalKombinacija::where('idMatBoja', '=', $materijalBoja->idMatBoja)
+            ->where('idDimenzije', '=', $idDimenzije)
+            ->first();
+
+        // Proveri da li si pronašao kombinaciju sa dimenzijama
+        if (!$materijalKombinacija) {
+            return response()->json(['error' => 'Kombinacija nije pronađena'], 405);
+        }
+
+        return response()->json([
+            'idMatKomb' => $materijalKombinacija->idMatKomb,
+        ]);
+    }
+
+
+    public function edit($id){
+
+        $materijal = Materijal::find($id);
+        $materijalNaziv = $materijal->naziv_m;
+        $materijalOpis = $materijal->opis_m;
+
+        return view('materijali.edit', compact('materijal', 'materijalNaziv', 'materijalOpis'));
+    }
+
+    public function update($id){
+
+        $naziv = request()->input('naziv');
+        $opis = request()->input('opis');
+
+        $materijal = Materijal::find($id);
+
+        $materijal->naziv_m = $naziv;
+        $materijal->opis_m = $opis;
+
+        $materijal->save();
+
+        return redirect()->route('materijali.show', ['id' => $id]);
+    }
+
+
+    public function delete($id){
+
+        $materijal = Materijal::find($id);
+        dd($materijal->naziv_m . ' je obrisan/a!');
+
+        $materijal->delete();
+
+        return redirect()->route('materijali.index');
     }
 }

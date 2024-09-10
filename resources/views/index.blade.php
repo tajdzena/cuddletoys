@@ -28,8 +28,7 @@
         </button>
     </div>
 
-    <!-- Najpopularnije igračke -->
-    <x-title>Naše najpopularnije igračke</x-title>
+    <x-title>Naše najnovije igračke</x-title>
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-12 mb-12">
 {{--        <x-card-proizvod putanja="images/igracke/zaba/zaba-zelena-crna.png" href="igracka" alt="Žaba" naziv="Žaba" cena="2000 RSD"></x-card-proizvod>--}}
         @foreach($najnovijeIgracke as $igracka)
@@ -39,12 +38,17 @@
                 :alt="ucfirst($igracka->naziv_i)"
                 :naziv="ucfirst($igracka->naziv_i)"
                 :cena="isset($igracka->ukupnaCena) ? ('Od ' . sprintf('%.2f', $igracka->ukupnaCena) . ' RSD') : '/ RSD'">
+                <form class="add-to-cart-form" method="POST" action="{{ route('dodajUKorpu') }}">
+                    @csrf
+                    <input type="hidden" name="idIgrKomb" value="{{ $igracka->defaultKombinacija->idIgrKomb }}">
+                    <input type="hidden" name="kolicina" value="1">
+                    <x-button type="submit" class="mt-4 px-4 py-2">Dodaj u korpu</x-button>
+                </form>
             </x-card-proizvod>
         @endforeach
     </div>
 
-    <!-- Najpopularniji materijali -->
-    <x-title>Naši najpopularniji materijali</x-title>
+    <x-title>Naši najnoviji materijali</x-title>
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-12">
 {{--        <x-card-proizvod putanja="images/materijali/heklica/heklica3mm.jpg" alt="Heklica" href="materijal" naziv="Heklica 3-12mm" cena="200 RSD"></x-card-proizvod>--}}
         @foreach($najnovijiMaterijali as $materijal)
@@ -54,9 +58,58 @@
                 :alt="ucfirst($materijal->naziv_m)"
                 :naziv="ucfirst($materijal->naziv_m)"
                 :cena="isset($materijal->defaultKombinacija->cena_m) ? ('Od ' . sprintf('%.2f', $materijal->defaultKombinacija->cena_m) . ' RSD') : '/ RSD'">
+                <!-- Forma za dodavanje u korpu -->
+                <form class="add-to-cart-form" method="POST" action="{{ route('dodajUKorpu') }}">
+                    @csrf
+                    <input type="hidden" name="idMatKomb" value="{{ $materijal->defaultKombinacija->idMatKomb }}">
+                    <input type="hidden" name="kolicina" value="1">
+                    <x-button type="submit" class="mt-4 px-4 py-2">Dodaj u korpu</x-button>
+                </form>
             </x-card-proizvod>
         @endforeach
     </div>
 </x-glavni-div>
 
 <x-footer />
+
+
+<script>
+    $(document).ready(function () {
+        // Kada korisnik pošalje formu za dodavanje u korpu
+        $('form').on('submit', function(event) {
+            event.preventDefault(); // Spreči da se stranica osveži
+
+            let formData = $(this).serialize(); // Uzmi podatke iz forme
+
+            $.ajax({
+                url: $(this).attr('action'), // URL iz action atributa forme
+                method: $(this).attr('method'), // Metoda iz method atributa
+                data: formData,
+                success: function(response) {
+                    if (response.success) {
+                        // Prikaži poruku o uspešnom dodavanju
+                        showPopupMessage(response.message);
+                    }
+                },
+                error: function() {
+                    showPopupMessage('Došlo je do greške pri dodavanju proizvoda u korpu.');
+                }
+            });
+        });
+
+        // Funkcija za prikazivanje pop-up poruke
+        function showPopupMessage(message) {
+            // Kreiraj element za prikazivanje poruke
+            let popup = $('<div></div>')
+                .addClass('popup-message bg-yellow/80 text-green py-2 px-4 rounded shadow-md')
+                .text(message)
+                .hide()
+                .appendTo('body');
+
+            // Prikaži poruku
+            popup.fadeIn(200).delay(3000).fadeOut(400, function() {
+                $(this).remove(); // Ukloni poruku nakon što se ugasi
+            });
+        }
+    });
+</script>
