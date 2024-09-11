@@ -22,6 +22,7 @@ class Posiljka extends Model
                             'mejl_p',
                             'telefon_p'];
 
+
     // Veza sa modelom Korisnik
     public function korisnik()
     {
@@ -31,6 +32,6 @@ class Posiljka extends Model
     // Veza sa modelom Racun
     public function racun()
     {
-        return $this->hasOne(Racun::class, 'idPosiljka');
+        return $this->hasOne(Racun::class, 'idPosiljka', 'idPosiljka');
     }
 }

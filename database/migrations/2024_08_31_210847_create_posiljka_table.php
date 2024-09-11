@@ -17,6 +17,11 @@ return new class extends Migration
             $table->string('adresa_isporuke');
             $table->string('status_posiljke');
             $table->timestamp('vreme_statusa');
+            $table->foreignId('idKorisnik')->constrained('korisnik', 'idKorisnik')->cascadeOnDelete();
+            $table->string('ime_p');
+            $table->string('prezime_p');
+            $table->string('mejl_p');
+            $table->string('telefon_p');
             $table->timestamps();
         });
     }

@@ -12,7 +12,7 @@
                         @error('prezime') <li>{{ $message }}</li> @enderror
                         @error('mejl') <li>{{ $message }}</li> @enderror
                         @error('kor_ime') <li>{{ $message }}</li> @enderror
-                        @error('adresa') <li>{{ $message }}</li> @enderror
+                        @error('adresa_kor') <li>{{ $message }}</li> @enderror
                     </ul>
                 </div>
             @endif
@@ -26,7 +26,7 @@
             <x-label-input for="prezime" text="Prezime" type="text" id="prezime" name="prezime" value="{{ $korisnik->prezime }}"></x-label-input>
             <x-label-input for="mejl" text="Mejl" type="email" id="mejl" name="mejl" value="{{ $korisnik->mejl }}"></x-label-input>
             <x-label-input for="kor_ime" text="Korisničko ime" type="text" id="kor_ime" name="kor_ime" value="{{ $korisnik->kor_ime }}"></x-label-input>
-            <x-label-input for="adresa" text="Adresa" type="text" id="adresa" name="adresa" value="{{ $korisnik->adresa_kor }}"></x-label-input>
+            <x-label-input for="adresa_kor" text="Adresa" type="text" id="adresa_kor" name="adresa_kor" value="{{ $korisnik->adresa_kor }}"></x-label-input>
             <x-button type="submit" class="mt-4 py-2 px-4">Izmeni</x-button>
         </form>
     </div>

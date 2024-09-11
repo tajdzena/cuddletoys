@@ -35,7 +35,7 @@
     <td class="px-4 py-4 border-b border-gray-200 bg-brighter-peach text-sm text-center">
         @if($vrsta == 'igracka')
             <x-select id='nacin_pravljenja-{{ $stavka->idStavka }}' name='nacin_pravljenja[]'>
-                <x-option value='' isDisabled='yes'>Izaberi način pravljenja</x-option>
+{{--                <x-option value='' isDisabled='yes'>Izaberi način pravljenja</x-option>--}}
                 <x-option value='gotova' :isSelected="$stavka->nacin_pravljenja == 'gotova' ? 'yes' : ''">Gotova igračka</x-option>
                 <x-option value='samostalno' :isSelected="$stavka->nacin_pravljenja == 'samostalno' ? 'yes' : ''">Samostalno</x-option>
             </x-select>

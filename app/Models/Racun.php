@@ -17,7 +17,7 @@ class Racun extends Model
     // Veza sa modelom Posiljka
     public function posiljka()
     {
-        return $this->belongsTo(Posiljka::class, 'idPosiljka');
+        return $this->belongsTo(Posiljka::class, 'idPosiljka', 'idPosiljka');
     }
 
     // Veza sa modelom MetodPlacanja

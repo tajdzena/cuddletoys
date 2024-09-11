@@ -41,19 +41,15 @@ class KorisnikController extends Controller
     public function getPorudzbineForUser($idKorisnik)
     {
         $korisnik = Auth::user();
-        Log::info($korisnik);
 
         // Provera da li je korisnik admin ili kurir
-//        if ($korisnik->can('isAdmin') || $korisnik->can('isKurir')) {
-        if ($korisnik->getAuthIdentifier() == 1 || $korisnik->getAuthIdentifier() == 3) {
+        if ($korisnik->getTipKor() == 1 || $korisnik->getTipKor() == 3) {
             // Prikaz aktuelnih porudžbina za odabranog korisnika
             $aktuelnePorudzbine = Posiljka::where('idKorisnik', $idKorisnik)
                 ->where('status_posiljke', '!=', 'isporučena')
                 ->with('racun.metodPlacanja')
                 ->orderBy('created_at', 'desc')
                 ->get();
-
-            //Log::info($aktuelnePorudzbine);
 
             // Prikaz prethodnih porudžbina za odabranog korisnika
             $prethodnePorudzbine = Posiljka::where('idKorisnik', $idKorisnik)
@@ -62,14 +58,7 @@ class KorisnikController extends Controller
                 ->orderBy('created_at', 'desc')
                 ->get();
 
-            //Log::info($prethodnePorudzbine);
-
             $korisnici = Korisnik::all();
-
-//            return response()->json([
-//               'aktuelnePorudzbine' => $aktuelnePorudzbine,
-//               'prethodnePorudzbine' => $prethodnePorudzbine,
-//            ]);
 
             // Vraćamo HTML partial za AJAX poziv
             return view('korisnici.nalog.partials.porudzbine', compact('aktuelnePorudzbine', 'prethodnePorudzbine'))->render();
@@ -89,8 +78,11 @@ class KorisnikController extends Controller
             'prezime' => ['required'],
             'mejl' => 'required|email|unique:korisnik,mejl,' . $korisnik->getAuthIdentifier() . ',idKorisnik', //umesto idKorisnik
             'kor_ime' => 'required|unique:korisnik,kor_ime,' . $korisnik->getAuthIdentifier() . ',idKorisnik',
-            'adresa' => ['nullable'],
-        ]);
+            'adresa_kor' => ['nullable'],
+        ], [
+            //prilagodjene poruke o greskama
+        ],
+        ['kor_ime' => 'korisničko ime']);
 
         $korisnik->update($attributes);
 
@@ -138,10 +130,6 @@ class KorisnikController extends Controller
         $mesec = request()->input('mesec'); //9
         $godina = request()->input('godina'); //2024
 
-        // Proveri vrednosti meseca i godine
-//       Log::info('Mesec: ' . $mesec);
-//        Log::info('Godina: ' . $godina);
-
         if (!$mesec || !$godina) {
             return response()->json(['error' => 'Mesec i godina su obavezni.'], 400);
         }
@@ -151,11 +139,8 @@ class KorisnikController extends Controller
             ->whereMonth('created_at', $mesec)
             ->get();
 
-        //Log::info('Prodaja ' . $prodaje);
-
         $ukupanBrojProdajaMesec = $prodaje->count();
 
-        //Log::info('Ukupan broj prodaja ' . $ukupanBrojProdaja);
 
         // Ukupna zarada iz tabele racun SAMO za taj MESEC u godini
         $ukupnaZaradaMesec = Racun::whereHas('logProdaje', function($query) use ($mesec, $godina) {
@@ -163,7 +148,6 @@ class KorisnikController extends Controller
                 ->whereMonth('created_at', $mesec);
         })->sum('iznos');
 
-        //Log::info('Ukupna zarada ' . $ukupnaZarada);
 
         // Zarada po SVIM mesecima u godini (za grafikon)
         $zaradaPoMesecima = Racun::selectRaw('MONTH(datum_vreme_izdavanjaR) as mesec, SUM(iznos) as zarada')
@@ -179,14 +163,10 @@ class KorisnikController extends Controller
             $zaradaZaSveMesece[$i] = $zaradaPoMesecima[$i] ?? 0;
         }
 
-        //Log::info('Zarada po mesecu ' . json_encode($zaradaPoMesecu));
-
         // Broj prodaja po proizvodu
         $igracke = Igracka::all(); // Nazivi igračaka
         $materijali = Materijal::all(); // Nazivi materijala
 
-//        Log::info('Igracke: ' . $igracke);
-//        Log::info('Materijali: ' . $materijali);
 
         return response()->json([
             'ukupanBrojProdajaMesec' => $ukupanBrojProdajaMesec,

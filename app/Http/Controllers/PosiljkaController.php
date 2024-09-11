@@ -15,12 +15,18 @@ class PosiljkaController extends Controller{
 
         $korisnik = Auth::user();
 
-        if ($korisnik->getAuthIdentifier() == 1 || $korisnik->getAuthIdentifier() == 3) {
+        if ($korisnik->getTipKor() == 1 || $korisnik->getTipKor() == 3) {
             $posiljka = Posiljka::findOrFail($id);
             $status = request()->input('status');
 
             $posiljka->status_posiljke = $status;
             $posiljka->vreme_statusa = now();
+
+            if($posiljka->status_posiljke == 'isporučena' && $posiljka->racun->metodPlacanja->naziv_p == 'po preuzeću'){
+                $posiljka->racun->datum_vreme_placanja = now();
+                $posiljka->racun->save();
+            }
+
             $posiljka->save();
 
             return redirect()->back()->with('success', 'Status porudžbine uspešno ažuriran.');
@@ -36,7 +42,7 @@ class PosiljkaController extends Controller{
 
         $korisnik = Auth::user();
 
-        if ($korisnik->getAuthIdentifier() == 1) {
+        if ($korisnik->getTipKor() == 1) {
             $posiljka = Posiljka::findOrFail($id);
             $posiljka->delete();
 

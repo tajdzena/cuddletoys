@@ -43,7 +43,7 @@
             <div>
                 <h3 class="text-md font-bold">Korisni linkovi</h3>
                 <ul class="mt-2 space-y-1 list-none">
-                    <x-footer-link putanja="/moj-nalog">Moj nalog</x-footer-link>
+                    <x-footer-link putanja="/nalog">Moj nalog</x-footer-link>
                     <x-footer-link putanja="/registracija">Registracija</x-footer-link>
                     <x-footer-link putanja="/korpa">Korpa</x-footer-link>
                 </ul>

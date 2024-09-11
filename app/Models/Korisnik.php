@@ -41,6 +41,11 @@ class Korisnik extends Authenticatable
         return $this->idKorisnik;
     }
 
+    public function getTipKor(){
+        return $this->idTipKor;
+    }
+
+
     public function tip()
     {
         return $this->belongsTo(TipKorisnika::class, 'idTipKor');

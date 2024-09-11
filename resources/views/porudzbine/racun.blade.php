@@ -24,9 +24,9 @@
         <div class="border border-green border-2 p-4 rounded-lg">
             <p class="text-md text-gray-700 font-semibold mb-2">Broj računa: <span class="text-dark-pink font-bold">#{{ str_pad($racun->idRacun, 8, '0', STR_PAD_LEFT) }}</span></p>
             <p class="text-md text-gray-700 font-semibold mb-2">Iznos: <span class="text-dark-pink font-bold">{{ sprintf('%.2f', $racun->iznos) }} RSD</span></p>
-            <p class="text-md text-gray-700 font-semibold mb-2">Metod plaćanja: <span class="text-dark-pink font-bold">{{ $racun->idMetodPlacanja == 1 ? 'Kartica' : 'Po preuzeću' }}</span></p>
+            <p class="text-md text-gray-700 font-semibold mb-2">Metod plaćanja: <span class="text-dark-pink font-bold">{{ $racun->idMetodPlacanja == 2 ? 'Kartica' : 'Po preuzeću' }}</span></p>
             <p class="text-md text-gray-700 font-semibold mb-2">Datum i vreme izdavanja računa: <span class="text-dark-pink font-bold">{{ $racun->datum_vreme_izdavanjaR->format('d.m.Y H:i') }}</span></p>
-            <p class="text-md text-gray-700 font-semibold">Datum i vreme plaćanja: <span class="text-dark-pink font-bold">{{ $racun->idMetodPlacanja == 1 ? $racun->datum_vreme_placanja->format('d.m.Y H:i') : 'Po preuzeću' }}</span></p>
+            <p class="text-md text-gray-700 font-semibold">Datum i vreme plaćanja: <span class="text-dark-pink font-bold">{{ $racun->idMetodPlacanja == 2 ? $racun->datum_vreme_placanja->format('d.m.Y H:i') : 'Po preuzeću' }}</span></p>
         </div>
     </div>
 </x-glavni-div>

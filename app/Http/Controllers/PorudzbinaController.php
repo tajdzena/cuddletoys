@@ -19,23 +19,20 @@ class PorudzbinaController extends Controller{
     {
         $korisnik = Auth::user();
 
-        // Find or create the cart for the user
+        // Pronađi ili kreiraj korpu za trenutno ulogovanog korisnika
         $korpa = Korpa::firstOrCreate(
             ['idKorisnik' => $korisnik->getAuthIdentifier()],
-            ['ukupna_cena' => 0]  // Postavi pocetnu vrednost za ukupnu cenu
+            ['ukupna_cena' => 0]  // Postavi početnu vrednost za ukupnu cenu
         );
 
-        // Proveri da li se prosledjuje igracka ili materijal
-        $idIgrKomb = request()->input('idIgrKomb');  // Kombinacija igracke
+        // Proveri da li se prosleđuje igračka ili materijal
+        $idIgrKomb = request()->input('idIgrKomb');  // Kombinacija igračke
         $idMatKomb = request()->input('idMatKomb');  // Kombinacija materijala
         $kolicina = request()->input('kolicina');
 
-        //dd($kolicina);
-        //dd($idIgrKomb);
-
-        // Proveri da li je dodata igracka ili materijal
+        // Proveri da li je dodata igračka ili materijal
         if ($idIgrKomb) {
-            // Dodaj igracku u korpu
+            // Dodaj igračku u korpu
             $stavkaKorpe = StavkaKorpe::create([
                 'idKorpa' => $korpa->idKorpa,
                 'idIgrKomb' => $idIgrKomb,
@@ -51,10 +48,6 @@ class PorudzbinaController extends Controller{
             ]);
         }
 
-//        dd($stavkaKorpe);
-
-        // Optionally return a success message or redirect to the cart page
-        //return redirect()->route('porudzbine.korpa')->with('success', 'Proizvod je uspešno dodat u korpu.');
         return response()->json(['success' => true, 'message' => 'Proizvod je uspešno dodat u korpu!']);
     }
 
@@ -62,7 +55,7 @@ class PorudzbinaController extends Controller{
     {
         $korisnik = Auth::user();
 
-        // Find the user's cart
+        // Pronađi korpu trenutnog korisnika
         $korpa = Korpa::where('idKorisnik', $korisnik->getAuthIdentifier())->first();
 
         if ($korpa) {
@@ -97,9 +90,6 @@ class PorudzbinaController extends Controller{
             $ukupnaCena = 0;
         }
 
-        //dd($stavkeKorpe);
-
-        // Return the view with cart items
         return view('porudzbine.korpa', compact('stavkeKorpe', 'ukupnaCena'));
     }
 
@@ -163,42 +153,41 @@ class PorudzbinaController extends Controller{
         $korisnik = Auth::user();
         $korpa = Korpa::where('idKorisnik', $korisnik->getAuthIdentifier())->first();
 
-        $adresa_placanja = request()->input('adresa-placanja');
-        //dd($adresa_placanja);
-        //provera da li se lepo prosledjuju podaci
+
+        // Validacija korisničkih podataka
+        $attributes = request()->validate([
+            'ime' => ['required'],
+            'prezime' => ['required'],
+            'mejl' => ['required'],
+            'telefon' => ['required'],
+            'adresa_placanja' => ['required'],
+            'adresa_isporuke' => ['required'],
+            'metod_placanja' => ['required']
+        ], [], ["adresa_placanja" => 'adresa plaćanja',
+                "metod_placanja" => 'metod plaćanja',]);
 
         // Kreiranje nove pošiljke
         $posiljka = Posiljka::create([
-            'adresa_placanja' => request()->input('adresa-placanja'),
-            'adresa_isporuke' => request()->input('adresa-isporuke'),
+            'adresa_placanja' => $attributes['adresa_placanja'],
+            'adresa_isporuke' => $attributes['adresa_isporuke'],
             'status_posiljke' => 'u izradi', // Postavi početni status
             'vreme_statusa' => now(),
             'idKorisnik' => $korisnik->getAuthIdentifier(),
-            'ime_p' => request()->input('ime'),
-            'prezime_p' => request()->input('prezime'),
-            'mejl_p' => request()->input('mejl'),
-            'telefon_p' => request()->input('telefon'),
+            'ime_p' => $attributes['ime'],
+            'prezime_p' => $attributes['prezime'],
+            'mejl_p' => $attributes['mejl'],
+            'telefon_p' => $attributes['telefon'],
         ]);
 
-        // Proveri metod plaćanja
-        $metodPlacanja = request()->input('metod-placanja');
-        if($metodPlacanja === 'kartica'){
-            $metodPlacanja = 1;
-        }
-        elseif($metodPlacanja === 'po preuzeću'){
-            $metodPlacanja = 2;
-        }
 
-        //dd($metodPlacanja);
+        // Proveri metod plaćanja
+        $metodPlacanja = $attributes['metod_placanja'];
+
         $datumPlacanja = null;
 
-        if ($metodPlacanja == 1) {
-            // Ako je kartica, postavi vreme plaćanja
+        if($metodPlacanja == 2){
             $datumPlacanja = now();
         }
-
-//        $iznos = request()->input('ukupan_iznos');
-//        dd($iznos);
 
         // Kreiranje računa nakon pošiljke
         $racun = Racun::create([

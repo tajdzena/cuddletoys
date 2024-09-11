@@ -94,6 +94,7 @@ Route::delete('/korpa-ukloni/{id}', [PorudzbinaController::class, 'ukloniStavku'
 Route::post('/azuriraj-nacin-pravljenja', [PorudzbinaController::class, 'azurirajNacinPravljenja'])->name('azurirajNacinPravljenja')->middleware('auth');
 Route::post('/azuriraj-kolicinu', [PorudzbinaController::class, 'azurirajKolicinu'])->name('azurirajKolicinu')->middleware('auth');
 
+Route::get('/porudzbina', [PorudzbinaController::class, 'porudzbina'])->name('porudzbina')->middleware('auth');
 Route::post('/porudzbina', [PorudzbinaController::class, 'porudzbina'])->name('porudzbina')->middleware('auth');
 Route::post('/zavrsi-porudzbinu', [PorudzbinaController::class, 'zavrsiPorudzbinu'])->name('zavrsiPorudzbinu')->middleware('auth');
 Route::get('/racun', [PorudzbinaController::class, 'racun'])->name('racun')->middleware('auth');

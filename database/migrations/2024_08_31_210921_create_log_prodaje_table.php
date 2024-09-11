@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id('idLogProdaje');
 //            $table->foreignId('idMaterijal')->nullable()->constrained('materijal', 'idMaterijal');
 //            $table->foreignId('idIgracka')->nullable()->constrained('igracka', 'idIgracka');
-            $table->foreignId('idRacun')->constrained('racun', 'idRacun');
+            $table->foreignId('idRacun')->constrained('racun', 'idRacun'); //->cascadeOnDelete();
             $table->foreignId('idKorisnik')->constrained('korisnik', 'idKorisnik')->cascadeOnDelete();
             $table->timestamps();
         });

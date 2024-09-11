@@ -6,6 +6,9 @@
         <p>Još uvek nemaš aktuelne porudžbine.</p>
     @else
         @foreach ($aktuelnePorudzbine as $posiljka)
+            @if(!$posiljka->racun)
+                <p>NEMA RACUNA</p>
+            @else
             <x-card-porudzbina
                 pret_ili_akt="aktuelna"
                 broj_posiljke="#{{ sprintf('%08d', $posiljka->idPosiljka) }}"
@@ -21,6 +24,7 @@
                 iznos="{{ sprintf('%.2f', $posiljka->racun->iznos) }} RSD"
                 metod_placanja="{{ ucfirst($posiljka->racun->metodPlacanja->naziv_p) }}"
             ></x-card-porudzbina>
+            @endif
 
 
             <!-- Ako je kurir, prikaži opciju za promenu statusa -->
@@ -42,7 +46,7 @@
                 <form action="{{ route('posiljke.delete', ['id' => $posiljka->idPosiljka]) }}" method="POST">
                     @csrf
                     @method('DELETE')
-                    <x-button type="submit" class="bg-blue hover:bg-blue/40 text-white mb-8 py-1 px-2">Obriši porudžbinu</x-button>
+                    <x-button type="submit" class="!bg-blue hover:!bg-blue/40 text-white mb-8 py-1 px-4">Obriši porudžbinu</x-button>
                 </form>
             @endcan
 
@@ -81,7 +85,7 @@
                 <form action="{{ route('posiljke.delete', ['id' => $posiljka->idPosiljka]) }}" method="POST">
                     @csrf
                     @method('DELETE')
-                    <x-button type="submit" class="bg-blue hover:bg-blue/40 text-white mb-8 py-1 px-2">Obriši porudžbinu</x-button>
+                    <x-button type="submit" class="!bg-blue hover:!bg-blue/40 text-white mb-8 py-1 px-4">Obriši porudžbinu</x-button>
                 </form>
             @endcan
         @endforeach

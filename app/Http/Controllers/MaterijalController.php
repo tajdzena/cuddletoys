@@ -145,7 +145,11 @@ class MaterijalController extends Controller
 
     public function update($id){
 
-        $naziv = request()->input('naziv');
+        $attributes = request()->validate([
+            'naziv' => ['required']
+        ]);
+
+        $naziv = $attributes['naziv'];
         $opis = request()->input('opis');
 
         $materijal = Materijal::find($id);

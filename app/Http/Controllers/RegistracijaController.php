@@ -28,8 +28,7 @@ class RegistracijaController extends Controller
             'lozinka' => ['required', 'confirmed', Password::min(8)
                                                     ->mixedCase() // Bar jedno veliko i malo slovo
                                                     ->numbers() // Bar jedan broj
-                                                    ->symbols() // Bar jedan specijalni znak
-        ],
+                                                    ->symbols()], // Bar jedan specijalni znak
             'adresa' => ['nullable'],
         ],
         [

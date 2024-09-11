@@ -9,7 +9,7 @@
         / <a href="{{ route('materijali.edit', ['id' => $materijal->idMaterijal]) }}" class="hover:underline"> Izmena </a>
     </x-path>
 
-    <x-title>Izmena igračke</x-title>
+    <x-title>Izmena materijala</x-title>
     {{--    <p class="text-lg text-center text-gray-700 mb-12">Postani već danas deo naše heklane družine! ♡</p>--}}
 
     <!-- Dodajemo klase za centriranje -->
@@ -40,7 +40,7 @@
                 <form action="{{ route('materijali.delete', ['id' => $materijal->idMaterijal]) }}" method="POST">
                     @csrf
                     @method('DELETE')
-                    <x-button type="submit" class="w-full px-4 py-3 mt-4 bg-blue hover:bg-blue/40">Obriši proizvod</x-button>
+                    <x-button type="submit" class="w-full px-4 py-3 mt-4 !bg-blue hover:!bg-blue/40">Obriši proizvod</x-button>
                 </form>
             @endcan
         </div>

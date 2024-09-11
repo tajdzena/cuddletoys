@@ -40,7 +40,7 @@
                 <form action="{{ route('igracke.delete', ['id' => $igracka->idIgracka]) }}" method="POST">
                     @csrf
                     @method('DELETE')
-                    <x-button type="submit" class="w-full px-4 py-3 mt-4 bg-blue hover:bg-blue/40">Obriši proizvod</x-button>
+                    <x-button type="submit" class="w-full px-4 py-3 mt-4 !bg-blue hover:!bg-blue/40">Obriši proizvod</x-button>
                 </form>
             @endcan
         </div>

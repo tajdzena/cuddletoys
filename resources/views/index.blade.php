@@ -10,10 +10,6 @@
     <div class="relative w-full max-w-7xl mx-auto mt-12 mb-12 overflow-hidden">
         <div id="slider" class="flex transition-transform duration-700 ease-in-out">
 
-{{--            <div class="min-w-full">--}}
-{{--                <img src="{{ asset('images/slicica.jpg') }}" alt="slicica" class="w-full h-64 object-cover rounded-md">--}}
-{{--            </div>--}}
-
             <x-slider-slika putanja="images/baneri/baner1.png" alt="Povratak u školu"></x-slider-slika>
             <x-slider-slika putanja="images/baneri/baner2.png" alt="Akcija za apsolvente"></x-slider-slika>
             <x-slider-slika putanja="images/baneri/baner3.png" alt="CuddleToys ponuda"></x-slider-slika>
@@ -30,7 +26,6 @@
 
     <x-title>Naše najnovije igračke</x-title>
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-12 mb-12">
-{{--        <x-card-proizvod putanja="images/igracke/zaba/zaba-zelena-crna.png" href="igracka" alt="Žaba" naziv="Žaba" cena="2000 RSD"></x-card-proizvod>--}}
         @foreach($najnovijeIgracke as $igracka)
             <x-card-proizvod
                 :putanja="isset($igracka->defaultBoje->slika) ? $igracka->defaultBoje->slika->putanja : 'images/no-image.jpg'"
@@ -50,7 +45,6 @@
 
     <x-title>Naši najnoviji materijali</x-title>
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-12">
-{{--        <x-card-proizvod putanja="images/materijali/heklica/heklica3mm.jpg" alt="Heklica" href="materijal" naziv="Heklica 3-12mm" cena="200 RSD"></x-card-proizvod>--}}
         @foreach($najnovijiMaterijali as $materijal)
             <x-card-proizvod
                 :putanja="isset($materijal->defaultKombinacija->slika) ? $materijal->defaultKombinacija->slika->putanja : 'images/no-image.jpg'"

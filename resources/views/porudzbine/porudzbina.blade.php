@@ -19,6 +19,16 @@
             <form action="{{ route('zavrsiPorudzbinu') }}" method="POST">
                 @csrf
 
+                @if ($errors->any())
+                    <div class="bg-red-100 text-red-500 p-3 mb-6 rounded">
+                        <ul>
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
+
                 <!-- Koristi lične podatke sa profila -->
                 <div class="flex items-center mb-4">
                     <input type="checkbox" id="koristi-licne-podatke" class="mr-2">
@@ -27,19 +37,19 @@
 
                 <!-- Ime i Prezime -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <x-label-input for="ime" text="Ime" type="text" id="ime" name="ime" placeholder="Tvoje ime"></x-label-input>
-                    <x-label-input for="prezime" text="Prezime" type="text" id="prezime" name="prezime" placeholder="Tvoje prezime"></x-label-input>
+                    <x-label-input for="ime" text="Ime" type="text" id="ime" name="ime" placeholder="Tvoje ime" value="{{old('ime')}}"></x-label-input>
+                    <x-label-input for="prezime" text="Prezime" type="text" id="prezime" name="prezime" placeholder="Tvoje prezime" value="{{old('prezime')}}"></x-label-input>
                 </div>
 
                 <!-- Mejl i Telefon -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <x-label-input for="mejl" text="Mejl" type="email" id="mejl" name="mejl" placeholder="tvoj.mejl@gmail.com"></x-label-input>
-                    <x-label-input for="telefon" text="Telefon" type="text" id="telefon" name="telefon" placeholder="0601234567"></x-label-input>
+                    <x-label-input for="mejl" text="Mejl" type="email" id="mejl" name="mejl" placeholder="tvoj.mejl@gmail.com" value="{{old('mejl')}}"></x-label-input>
+                    <x-label-input for="telefon" text="Telefon" type="text" id="telefon" name="telefon" placeholder="0601234567" value="{{old('telefon')}}"></x-label-input>
                 </div>
 
                 <!-- Adresa plaćanja i Adresa isporuke -->
-                <x-label-input for="adresa-placanja" text="Adresa plaćanja" type="text" id="adresa-placanja" name="adresa-placanja" placeholder="Beograd, Adresa 123, 11000"></x-label-input>
-                <x-label-input for="adresa-isporuke" text="Adresa isporuke" type="text" id="adresa-isporuke" name="adresa-isporuke" placeholder="Beograd, Adresa 123, 11000"></x-label-input>
+                <x-label-input for="adresa-placanja" text="Adresa plaćanja" type="text" id="adresa_placanja" name="adresa_placanja" placeholder="Beograd, Adresa 123, 11000" value="{{old('adresa_placanja')}}"></x-label-input>
+                <x-label-input for="adresa-isporuke" text="Adresa isporuke" type="text" id="adresa_isporuke" name="adresa_isporuke" placeholder="Beograd, Adresa 123, 11000" value="{{old('adresa_isporuke')}}"></x-label-input>
 
                 <!-- validaciju odraditi -->
         </div>
@@ -49,10 +59,10 @@
             <!-- Metod plaćanja -->
             <div class="bg-brighter-peach rounded-lg shadow-lg p-6">
                 <h2 class="text-lg font-bold text-dark-pink mb-4">Metod plaćanja</h2>
-                <x-select id="metod-placanja" name="metod-placanja">
+                <x-select id="metod_placanja" name="metod_placanja">
                     <x-option value="" isDisabled="yes">Izaberi metod plaćanja</x-option>
-                    <x-option value="1">Kartica</x-option>
-                    <x-option value="2">Po preuzeću</x-option>
+                    <x-option value="1">Po preuzeću</x-option>
+                    <x-option value="2">Kartica</x-option>
                 </x-select>
             </div>
 
@@ -91,15 +101,15 @@
                 $('#ime').val('{{ Auth::user()->ime }}');
                 $('#prezime').val('{{ Auth::user()->prezime }}');
                 $('#mejl').val('{{ Auth::user()->mejl }}');
-                $('#adresa-placanja').val('{{ isset(Auth::user()->adresa_kor) ? Auth::user()->adresa_kor : '' }}');
-                $('#adresa-isporuke').val('{{ isset(Auth::user()->adresa_kor) ? Auth::user()->adresa_kor : '' }}');
+                $('#adresa_placanja').val('{{ isset(Auth::user()->adresa_kor) ? Auth::user()->adresa_kor : '' }}');
+                $('#adresa_isporuke').val('{{ isset(Auth::user()->adresa_kor) ? Auth::user()->adresa_kor : '' }}');
             } else {
                 // Ako se skine oznaka, očisti polja
                 $('#ime').val('');
                 $('#prezime').val('');
                 $('#mejl').val('');
-                $('#adresa-placanja').val('');
-                $('#adresa-isporuke').val('');
+                $('#adresa_placanja').val('');
+                $('#adresa_isporuke').val('');
             }
         });
     });
